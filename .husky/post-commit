@@ -1,0 +1,21 @@
+#!/usr/bin/env sh
+. "$(dirname -- "$0")/_/husky.sh"
+
+# Auto-push after each commit.
+# Disable by running: AUTO_PUSH=0 git commit ...
+if [ "${AUTO_PUSH:-1}" = "0" ]; then
+  exit 0
+fi
+
+# Skip in CI contexts.
+if [ -n "${CI:-}" ]; then
+  exit 0
+fi
+
+# Only push when an upstream is configured.
+if ! git rev-parse --abbrev-ref --symbolic-full-name @{u} >/dev/null 2>&1; then
+  echo "auto-push: no upstream configured; skipping push"
+  exit 0
+fi
+
+git push
