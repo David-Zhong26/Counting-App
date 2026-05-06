@@ -16,7 +16,7 @@ export function HomeScreen({
   onGoOverview: () => void
 }) {
   return (
-    <div className="flex min-h-[720px] flex-col">
+    <div className="flex min-h-[926px] flex-col">
       <StatusBar />
 
       <div className="mt-1 flex items-center justify-end">
