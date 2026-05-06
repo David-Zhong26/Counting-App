@@ -10,15 +10,26 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   useEffect(() => {
     let cancelled = false
 
-    supabase.auth.getSession().then(({ data }: { data: { session: Session | null } }) => {
-      if (cancelled) return
-      setSession(data.session ?? null)
-      setLoading(false)
-    })
+    void supabase.auth
+      .getSession()
+      .then(({ data }: { data: { session: Session | null } }) => {
+        if (!cancelled) setSession(data.session ?? null)
+      })
+      .catch((err: unknown) => {
+        console.error('[小宝数数] getSession failed — check .env and Supabase URL/key.', err)
+        if (!cancelled) setSession(null)
+      })
+      .finally(() => {
+        if (!cancelled) setLoading(false)
+      })
 
     const { data: sub } = supabase.auth.onAuthStateChange(
-      (_event: AuthChangeEvent, nextSession: Session | null) => {
+      (event: AuthChangeEvent, nextSession: Session | null) => {
         setSession(nextSession)
+        // Ensures UI unlocks if INITIAL_SESSION arrives before getSession settles (or after Strict Mode remount).
+        if (event === 'INITIAL_SESSION') {
+          setLoading(false)
+        }
       },
     )
 

@@ -31,6 +31,10 @@ body {
   color: var(--pc-text);
 }
 
+#root {
+  min-height: 100%;
+}
+
 ::selection {
   background: rgba(107, 144, 136, 0.28);
 }
