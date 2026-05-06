@@ -136,7 +136,7 @@ export function HomeScreen({
             onClick={onDecrement}
             disabled={todayCount <= 0}
             aria-label="Subtract one from today count"
-            className="absolute bottom-[6px] left-[-18px] grid h-7 w-7 place-items-center rounded-full bg-pc-surface/85 text-[9px] font-semibold leading-none text-pc-accent shadow-neuSm ring-2 ring-white/95 ring-offset-0 transition enabled:active:scale-[0.99] disabled:pointer-events-none disabled:opacity-35"
+            className="absolute bottom-[6px] left-[-18px] grid h-7 w-7 place-items-center rounded-full bg-white text-[10px] font-semibold tracking-tightish text-pc-accent shadow-[12px_14px_28px_rgba(27,51,46,0.18),-10px_-10px_22px_rgba(255,255,255,0.75)] transition enabled:active:scale-[0.99] disabled:pointer-events-none disabled:opacity-35"
           >
             −1
           </button>
