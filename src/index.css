@@ -1,0 +1,36 @@
+@import "tailwindcss";
+
+:root {
+  /* Soft, Pantone-ish blue-green palette (no pure white background). */
+  --pc-bg: #d8e6e2; /* muted light blue-green */
+  --pc-surface: #deecea; /* slightly lifted surface */
+  --pc-surface-2: #d2e2dd; /* deeper surface for contrast */
+  --pc-text: #27413b; /* deep muted blue-green */
+  --pc-text-soft: rgba(39, 65, 59, 0.72);
+  --pc-offwhite: #f4f8f6;
+  --pc-accent: #6b9088; /* dusty jade */
+  --pc-accent-2: #5a827a;
+
+  --pc-shadow-dark: rgba(27, 51, 46, 0.16);
+  --pc-shadow-light: rgba(255, 255, 255, 0.55);
+
+  font-synthesis: none;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+html,
+body {
+  height: 100%;
+}
+
+body {
+  margin: 0;
+  background: radial-gradient(1200px 800px at 30% 10%, #e6f1ee 0%, var(--pc-bg) 55%, #cedfd9 100%);
+  color: var(--pc-text);
+}
+
+::selection {
+  background: rgba(107, 144, 136, 0.28);
+}
