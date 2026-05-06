@@ -3,9 +3,13 @@ import { NeumorphicCard } from '../ui/NeumorphicCard'
 export function ProgressRing({
   percent,
   caption = "You're on track.",
+  daysHit,
+  daysTotal = 7,
 }: {
   percent: number
   caption?: string
+  daysHit: number
+  daysTotal?: number
 }) {
   const clamped = Math.max(0, Math.min(100, percent))
 
@@ -53,7 +57,9 @@ export function ProgressRing({
               <div className="text-[22px] font-semibold tracking-tightish text-pc-text">
                 {clamped}%
               </div>
-              <div className="text-[11px] font-medium text-pc-text/60">5 of 7 days</div>
+              <div className="text-[11px] font-medium text-pc-text/60">
+                {daysHit} of {daysTotal} days
+              </div>
             </div>
           </div>
         </div>

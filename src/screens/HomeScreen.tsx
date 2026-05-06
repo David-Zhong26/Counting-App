@@ -29,8 +29,12 @@ export function HomeScreen({
   const [draft, setDraft] = useState(String(todayCount))
   const inputRef = useRef<HTMLInputElement>(null)
 
+  // Keep draft in sync when the stored count changes (e.g. after Supabase refresh).
   useEffect(() => {
-    if (!editing) setDraft(String(todayCount))
+    if (!editing) {
+      // eslint-disable-next-line react-hooks/set-state-in-effect -- sync draft when not actively editing
+      setDraft(String(todayCount))
+    }
   }, [todayCount, editing])
 
   useEffect(() => {

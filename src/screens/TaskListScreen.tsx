@@ -4,16 +4,18 @@ import { StatusBar } from '../ui/StatusBar'
 export function TaskListScreen({
   tasks,
   onSelectTask,
+  onLogout,
 }: {
   tasks: Task[]
   onSelectTask: (taskId: string) => void
+  onLogout: () => void
 }) {
   return (
     <div className="flex min-h-[926px] flex-col">
       <StatusBar />
 
       <div className="mt-4 text-center">
-        <div className="text-[26px] font-semibold tracking-tightish text-pc-text">Pulse Count</div>
+        <div className="text-[26px] font-semibold tracking-tightish text-pc-text">小宝数数</div>
         <div className="mt-1 text-[13px] font-medium text-pc-text/60">Choose a task to count.</div>
       </div>
 
@@ -47,6 +49,16 @@ export function TaskListScreen({
             </svg>
           </button>
         ))}
+      </div>
+
+      <div className="mt-auto pb-2 pt-10 text-center">
+        <button
+          type="button"
+          onClick={onLogout}
+          className="text-[12px] font-medium text-pc-text/45 underline-offset-4 hover:text-pc-text/65"
+        >
+          Log out
+        </button>
       </div>
     </div>
   )

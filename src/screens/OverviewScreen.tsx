@@ -11,12 +11,14 @@ export function OverviewScreen({
   taskName,
   weeklyChecks,
   weeklyPercent,
+  weekDaysHit,
   activity,
   onBack,
 }: {
   taskName: string
   weeklyChecks: WeekChecks
   weeklyPercent: number
+  weekDaysHit: number
   activity: ActivityRow[]
   onBack: () => void
 }) {
@@ -49,7 +51,7 @@ export function OverviewScreen({
 
       <div className="mt-8 space-y-5">
         <WeeklyCheckRow checks={weeklyChecks} />
-        <ProgressRing percent={weeklyPercent} />
+        <ProgressRing percent={weeklyPercent} daysHit={weekDaysHit} />
         <ReflectionCard text="Consistency is built one decision at a time." />
         <RecentActivityList rows={activity} />
       </div>
