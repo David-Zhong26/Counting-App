@@ -33,6 +33,8 @@ export default function App() {
               goal={goal}
               streak={streak}
               onIncrement={() => setTodayCount((c) => c + 1)}
+              onDecrement={() => setTodayCount((c) => Math.max(0, c - 1))}
+              onSetCount={(n) => setTodayCount(Math.max(0, Math.floor(n)))}
               onGoOverview={() => setScreen('overview')}
             />
           ) : (

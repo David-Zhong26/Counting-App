@@ -7,12 +7,16 @@ export function HomeScreen({
   goal,
   streak,
   onIncrement,
+  onDecrement,
+  onSetCount,
   onGoOverview,
 }: {
   todayCount: number
   goal: number
   streak: number
   onIncrement: () => void
+  onDecrement: () => void
+  onSetCount: (n: number) => void
   onGoOverview: () => void
 }) {
   return (
@@ -53,12 +57,44 @@ export function HomeScreen({
       </div>
 
       <div className="mt-14 flex flex-1 flex-col items-center">
-        <div className="text-[86px] font-semibold leading-none tracking-tightish text-pc-accent">
-          {todayCount}
+        <div className="relative inline-block pb-7">
+          <div className="text-[86px] font-semibold leading-none tracking-tightish text-pc-accent tabular-nums">
+            {todayCount}
+          </div>
+          <button
+            type="button"
+            onClick={onDecrement}
+            disabled={todayCount <= 0}
+            aria-label="Subtract one from today count"
+            className="absolute bottom-1 left-0 grid h-8 min-w-[2rem] place-items-center rounded-full bg-pc-surface/80 px-2 text-[11px] font-semibold leading-none text-pc-accent shadow-neuSm transition enabled:active:scale-[0.99] disabled:pointer-events-none disabled:opacity-35"
+          >
+            −1
+          </button>
         </div>
         <div className="mt-3 text-[12px] font-semibold tracking-[0.26em] text-pc-text/50">
           TODAY
         </div>
+
+        <label className="mt-4 flex items-center gap-2">
+          <span className="sr-only">Set today count</span>
+          <input
+            type="number"
+            min={0}
+            inputMode="numeric"
+            aria-label="Set today count"
+            value={todayCount}
+            onChange={(e) => {
+              const raw = e.target.value
+              if (raw === '') {
+                onSetCount(0)
+                return
+              }
+              const n = Number(raw)
+              if (!Number.isNaN(n)) onSetCount(n)
+            }}
+            className="w-[4.5rem] rounded-xl border-0 bg-pc-surface/70 px-2 py-1.5 text-center text-[13px] font-semibold text-pc-text shadow-neuInset outline-none ring-pc-accent/35 focus:ring-2"
+          />
+        </label>
 
         <button
           type="button"
