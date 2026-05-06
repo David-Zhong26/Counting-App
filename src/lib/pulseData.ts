@@ -17,17 +17,9 @@ type DailyCountDbRow = {
   updated_at: string
 }
 
-const DEFAULT_TASKS = [
-  { name: 'Deep work', goal: 50 },
-  { name: 'Water', goal: 8 },
-  { name: 'Stretch', goal: 5 },
-] as const
-
 const HISTORY_DAYS = 120
 
 export async function loadPulseTasks(userId: string): Promise<Task[]> {
-  await ensureDefaultTasks(userId)
-
   const { data: taskRowsRaw, error: taskErr } = await supabase
     .from('tasks')
     .select('id,name,goal,created_at')
@@ -36,7 +28,7 @@ export async function loadPulseTasks(userId: string): Promise<Task[]> {
 
   if (taskErr) throw taskErr
   const taskRows = taskRowsRaw as TaskRow[] | null
-  if (!taskRows?.length) throw new Error('No tasks available')
+  if (!taskRows?.length) return []
 
   const todayStr = toLocalDateString(new Date())
   await ensureTodayRows(
@@ -79,26 +71,6 @@ export async function loadPulseTasks(userId: string): Promise<Task[]> {
   )
 }
 
-async function ensureDefaultTasks(userId: string) {
-  const { data: existing, error: exErr } = await supabase
-    .from('tasks')
-    .select('id')
-    .eq('user_id', userId)
-    .limit(1)
-
-  if (exErr) throw exErr
-  if (existing?.length) return
-
-  const { error } = await supabase.from('tasks').insert(
-    DEFAULT_TASKS.map((t) => ({
-      user_id: userId,
-      name: t.name,
-      goal: t.goal,
-    })),
-  )
-  if (error) throw error
-}
-
 async function ensureTodayRows(userId: string, taskIds: string[], todayStr: string) {
   for (const taskId of taskIds) {
     const { data: row, error: selErr } = await supabase
@@ -115,10 +87,66 @@ async function ensureTodayRows(userId: string, taskIds: string[], todayStr: stri
       user_id: userId,
       task_id: taskId,
       date: todayStr,
-      count: 24,
+      count: 0,
     })
     if (insErr) throw insErr
   }
+}
+
+export async function fetchDisplayName(userId: string): Promise<string | null> {
+  const { data, error } = await supabase
+    .from('profiles')
+    .select('display_name')
+    .eq('id', userId)
+    .maybeSingle()
+
+  if (error) throw error
+  const row = data as { display_name: string | null } | null
+  const n = row?.display_name?.trim()
+  return n ? n : null
+}
+
+export async function saveDisplayName(userId: string, name: string) {
+  const trimmed = name.trim()
+  const { error } = await supabase.from('profiles').upsert(
+    {
+      id: userId,
+      display_name: trimmed || null,
+    },
+    { onConflict: 'id' },
+  )
+  if (error) throw error
+}
+
+export async function createTask(userId: string, name: string, goal: number): Promise<string> {
+  const g = Math.max(0, Math.floor(goal))
+  const nm = name.trim()
+  if (!nm) throw new Error('Task name is required.')
+
+  const { data: inserted, error } = await supabase
+    .from('tasks')
+    .insert({ user_id: userId, name: nm, goal: g })
+    .select('id')
+    .single()
+
+  if (error) throw error
+  const taskId = (inserted as { id: string }).id
+
+  const todayStr = toLocalDateString(new Date())
+  await ensureTodayRows(userId, [taskId], todayStr)
+
+  return taskId
+}
+
+export async function updateTaskGoal(userId: string, taskId: string, goal: number) {
+  const g = Math.max(0, Math.floor(goal))
+  const { error } = await supabase
+    .from('tasks')
+    .update({ goal: g })
+    .eq('id', taskId)
+    .eq('user_id', userId)
+
+  if (error) throw error
 }
 
 export async function upsertTodayCount(userId: string, taskId: string, count: number) {

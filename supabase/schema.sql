@@ -17,12 +17,22 @@ create table if not exists public.tasks (
   id uuid primary key default gen_random_uuid(),
   user_id uuid not null references auth.users (id) on delete cascade,
   name text not null,
-  goal int not null default 50,
+  goal int not null default 0,
   created_at timestamptz not null default now(),
   updated_at timestamptz not null default now()
 );
 
 create index if not exists tasks_user_id_idx on public.tasks (user_id);
+
+-- ---------------------------------------------------------------------------
+-- Profile (display name — avoids showing long auth user ids in UI)
+-- ---------------------------------------------------------------------------
+create table if not exists public.profiles (
+  id uuid primary key references auth.users (id) on delete cascade,
+  display_name text,
+  created_at timestamptz not null default now(),
+  updated_at timestamptz not null default now()
+);
 
 -- ---------------------------------------------------------------------------
 -- Daily counts per task (logical calendar date in the user's timezone is stored as date)
@@ -54,6 +64,11 @@ begin
 end;
 $$;
 
+drop trigger if exists set_profiles_updated_at on public.profiles;
+create trigger set_profiles_updated_at
+before update on public.profiles
+for each row execute function public.set_updated_at();
+
 drop trigger if exists set_tasks_updated_at on public.tasks;
 create trigger set_tasks_updated_at
 before update on public.tasks
@@ -69,6 +84,26 @@ for each row execute function public.set_updated_at();
 -- ---------------------------------------------------------------------------
 alter table public.tasks enable row level security;
 alter table public.daily_counts enable row level security;
+alter table public.profiles enable row level security;
+
+drop policy if exists "profiles_select_own" on public.profiles;
+create policy "profiles_select_own"
+on public.profiles for select
+to authenticated
+using (auth.uid() = id);
+
+drop policy if exists "profiles_insert_own" on public.profiles;
+create policy "profiles_insert_own"
+on public.profiles for insert
+to authenticated
+with check (auth.uid() = id);
+
+drop policy if exists "profiles_update_own" on public.profiles;
+create policy "profiles_update_own"
+on public.profiles for update
+to authenticated
+using (auth.uid() = id)
+with check (auth.uid() = id);
 
 drop policy if exists "tasks_select_own" on public.tasks;
 create policy "tasks_select_own"

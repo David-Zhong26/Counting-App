@@ -4,12 +4,20 @@ import { OverviewScreen } from './screens/OverviewScreen'
 import { TaskListScreen } from './screens/TaskListScreen'
 import type { ActivityRow } from './components/RecentActivityList'
 import type { Task } from './types/task'
-import { loadPulseTasks, upsertTodayCount } from './lib/pulseData'
+import {
+  createTask,
+  fetchDisplayName,
+  loadPulseTasks,
+  saveDisplayName,
+  updateTaskGoal,
+  upsertTodayCount,
+} from './lib/pulseData'
 import { toErrorMessage } from './lib/toErrorMessage'
 import { supabase } from './lib/supabase.js'
 
 export function PulseApp({ userId }: { userId: string }) {
   const [tasks, setTasks] = useState<Task[]>([])
+  const [displayName, setDisplayName] = useState<string | null>(null)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
   const [screen, setScreen] = useState<'list' | 'detail' | 'overview'>('list')
@@ -18,8 +26,12 @@ export function PulseApp({ userId }: { userId: string }) {
   const refresh = useCallback(async () => {
     try {
       setError(null)
-      const data = await loadPulseTasks(userId)
-      setTasks(data)
+      const [taskData, name] = await Promise.all([
+        loadPulseTasks(userId),
+        fetchDisplayName(userId),
+      ])
+      setTasks(taskData)
+      setDisplayName(name)
     } catch (e: unknown) {
       console.error('[小宝数数] refresh', e)
       setError(toErrorMessage(e))
@@ -28,10 +40,11 @@ export function PulseApp({ userId }: { userId: string }) {
 
   useEffect(() => {
     let cancelled = false
-    loadPulseTasks(userId)
-      .then((data) => {
+    Promise.all([loadPulseTasks(userId), fetchDisplayName(userId)])
+      .then(([taskData, name]) => {
         if (!cancelled) {
-          setTasks(data)
+          setTasks(taskData)
+          setDisplayName(name)
           setError(null)
         }
       })
@@ -48,6 +61,20 @@ export function PulseApp({ userId }: { userId: string }) {
       cancelled = true
     }
   }, [userId])
+
+  useEffect(() => {
+    if (selectedId && !tasks.some((t) => t.id === selectedId)) {
+      setSelectedId(null)
+      setScreen('list')
+    }
+  }, [tasks, selectedId])
+
+  useEffect(() => {
+    if (tasks.length === 0 && screen !== 'list') {
+      setScreen('list')
+      setSelectedId(null)
+    }
+  }, [tasks.length, screen])
 
   const selected = useMemo(
     () => tasks.find((t) => t.id === selectedId) ?? null,
@@ -99,7 +126,8 @@ export function PulseApp({ userId }: { userId: string }) {
         {showSchemaHint && (
           <p className="max-w-[280px] text-[11px] font-medium leading-relaxed text-pc-text/50">
             常见原因：尚未在 Supabase 执行仓库里的 <span className="text-pc-text/65">supabase/schema.sql</span>
-            ，或表结构与当前 App 不一致（需要含 <span className="text-pc-text/65">tasks</span> 与带{' '}
+            ，或表结构与当前 App 不一致（需要含 <span className="text-pc-text/65">tasks</span>、
+            <span className="text-pc-text/65">profiles</span> 与带{' '}
             <span className="text-pc-text/65">task_id</span> 的 <span className="text-pc-text/65">daily_counts</span>
             ）。
           </p>
@@ -109,8 +137,11 @@ export function PulseApp({ userId }: { userId: string }) {
           onClick={() => {
             setLoading(true)
             setError(null)
-            loadPulseTasks(userId)
-              .then(setTasks)
+            Promise.all([loadPulseTasks(userId), fetchDisplayName(userId)])
+              .then(([taskData, name]) => {
+                setTasks(taskData)
+                setDisplayName(name)
+              })
               .catch((e: unknown) => {
                 console.error('[小宝数数] loadPulseTasks retry', e)
                 setError(toErrorMessage(e))
@@ -129,10 +160,19 @@ export function PulseApp({ userId }: { userId: string }) {
     <>
       {screen === 'list' && (
         <TaskListScreen
+          displayName={displayName}
           tasks={tasks}
           onSelectTask={(id) => {
             setSelectedId(id)
             setScreen('detail')
+          }}
+          onCreateTask={async (name, goal) => {
+            await createTask(userId, name, goal)
+            await refresh()
+          }}
+          onSaveDisplayName={async (name) => {
+            await saveDisplayName(userId, name)
+            await refresh()
           }}
           onLogout={() => void supabase.auth.signOut()}
         />
@@ -149,6 +189,10 @@ export function PulseApp({ userId }: { userId: string }) {
             void persistCount(selected.id, Math.max(0, selected.todayCount - 1))
           }
           onSetCount={(n) => void persistCount(selected.id, n)}
+          onUpdateGoal={async (g) => {
+            await updateTaskGoal(userId, selected.id, g)
+            await refresh()
+          }}
           onBackToTasks={() => {
             setScreen('list')
             setSelectedId(null)

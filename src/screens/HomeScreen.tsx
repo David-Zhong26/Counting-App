@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from 'react'
+import { ModalShell } from '../components/ModalShell'
 import { SummaryPanel } from '../components/SummaryPanel'
 import { CircleIconButton } from '../ui/CircleIconButton'
 import { PulseIcon } from '../ui/PulseIcon'
@@ -12,6 +13,7 @@ export function HomeScreen({
   onIncrement,
   onDecrement,
   onSetCount,
+  onUpdateGoal,
   onBackToTasks,
   onGoOverview,
 }: {
@@ -22,6 +24,7 @@ export function HomeScreen({
   onIncrement: () => void
   onDecrement: () => void
   onSetCount: (n: number) => void
+  onUpdateGoal: (goal: number) => Promise<void>
   onBackToTasks: () => void
   onGoOverview: () => void
 }) {
@@ -29,13 +32,20 @@ export function HomeScreen({
   const [draft, setDraft] = useState(String(todayCount))
   const inputRef = useRef<HTMLInputElement>(null)
 
-  // Keep draft in sync when the stored count changes (e.g. after Supabase refresh).
+  const [goalOpen, setGoalOpen] = useState(false)
+  const [goalDraft, setGoalDraft] = useState(String(goal))
+  const [goalBusy, setGoalBusy] = useState(false)
+
   useEffect(() => {
     if (!editing) {
       // eslint-disable-next-line react-hooks/set-state-in-effect -- sync draft when not actively editing
       setDraft(String(todayCount))
     }
   }, [todayCount, editing])
+
+  useEffect(() => {
+    if (!goalOpen) setGoalDraft(String(goal))
+  }, [goal, goalOpen])
 
   useEffect(() => {
     if (editing && inputRef.current) {
@@ -159,9 +169,62 @@ export function HomeScreen({
         </button>
 
         <div className="mt-auto w-full">
-          <SummaryPanel today={todayCount} goal={goal} streak={streak} />
+          <SummaryPanel
+            today={todayCount}
+            goal={goal}
+            streak={streak}
+            onEditGoal={() => setGoalOpen(true)}
+          />
         </div>
       </div>
+
+      {goalOpen && (
+        <ModalShell
+          title="每日目标"
+          onClose={() => !goalBusy && setGoalOpen(false)}
+          footer={
+            <div className="flex gap-3">
+              <button
+                type="button"
+                disabled={goalBusy}
+                onClick={() => setGoalOpen(false)}
+                className="flex-1 rounded-xl2 bg-pc-bg/80 py-2.5 text-[13px] font-semibold text-pc-text/70 shadow-neuInset"
+              >
+                取消
+              </button>
+              <button
+                type="button"
+                disabled={goalBusy}
+                onClick={async () => {
+                  setGoalBusy(true)
+                  try {
+                    const n = Number(goalDraft)
+                    await onUpdateGoal(Number.isNaN(n) ? 0 : n)
+                    setGoalOpen(false)
+                  } finally {
+                    setGoalBusy(false)
+                  }
+                }}
+                className="flex-1 rounded-xl2 bg-white py-2.5 text-[13px] font-semibold text-pc-accent shadow-[12px_14px_28px_rgba(27,51,46,0.14)]"
+              >
+                {goalBusy ? '保存中…' : '保存'}
+              </button>
+            </div>
+          }
+        >
+          <label className="flex flex-col gap-1.5 text-left">
+            <span className="text-[11px] font-semibold tracking-[0.14em] text-pc-text/55">目标次数（可为 0）</span>
+            <input
+              type="number"
+              min={0}
+              inputMode="numeric"
+              value={goalDraft}
+              onChange={(e) => setGoalDraft(e.target.value)}
+              className="rounded-xl2 border-0 bg-pc-bg/80 px-3 py-2.5 text-[14px] font-medium text-pc-text shadow-neuInset outline-none ring-pc-accent/35 focus:ring-2"
+            />
+          </label>
+        </ModalShell>
+      )}
     </div>
   )
 }
