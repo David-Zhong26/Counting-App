@@ -107,7 +107,7 @@ export function PulseApp({ userId }: { userId: string }) {
     return (
       <output
         aria-label={frameLabel}
-        className="grid min-h-[926px] place-items-center text-[13px] font-medium text-pc-text/55"
+        className="grid min-h-dvh place-items-center text-[13px] font-medium text-pc-text/55"
       >
         Loading…
       </output>
@@ -120,7 +120,7 @@ export function PulseApp({ userId }: { userId: string }) {
       error.toLowerCase().includes('permission denied')
 
     return (
-      <div className="flex min-h-[926px] flex-col items-center justify-center gap-4 px-4 text-center">
+      <div className="flex min-h-dvh flex-col items-center justify-center gap-4 px-4 text-center">
         <p className="max-w-[280px] text-[13px] font-medium leading-relaxed text-pc-text/75">
           {error}
         </p>

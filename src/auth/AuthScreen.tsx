@@ -34,7 +34,7 @@ export function AuthScreen() {
   }
 
   return (
-    <div className="flex min-h-[926px] flex-col px-2">
+    <div className="flex min-h-dvh flex-col px-2">
       <div className="mt-16 text-center">
         <div className="text-[22px] font-semibold tracking-tightish text-pc-text">
           {mode === 'signup' ? 'Create your account' : 'Welcome back'}

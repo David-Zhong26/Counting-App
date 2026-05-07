@@ -1,7 +1,6 @@
 import { useCallback, useRef, useState } from 'react'
 import type { Task } from '../types/task'
 import { ModalShell } from '../components/ModalShell'
-import { StatusBar } from '../ui/StatusBar'
 
 export function TaskListScreen({
   displayName,
@@ -66,9 +65,7 @@ export function TaskListScreen({
   )
 
   return (
-    <div className="flex min-h-[926px] flex-col">
-      <StatusBar />
-
+    <div className="flex min-h-dvh flex-col">
       <div className="mt-3 flex flex-col items-center gap-3">
         <button
           type="button"

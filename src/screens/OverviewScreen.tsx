@@ -5,8 +5,6 @@ import { RecentActivityList } from '../components/RecentActivityList'
 import { ReflectionCard } from '../components/ReflectionCard'
 import { WeeklyCheckRow } from '../components/WeeklyCheckRow'
 import { CircleIconButton } from '../ui/CircleIconButton'
-import { StatusBar } from '../ui/StatusBar'
-
 export function OverviewScreen({
   displayName,
   taskName,
@@ -26,9 +24,7 @@ export function OverviewScreen({
 }) {
   const greetingLine = `你好呀～${displayName?.trim() || '朋友'}`
   return (
-    <div className="flex min-h-[926px] flex-col">
-      <StatusBar />
-
+    <div className="flex min-h-dvh flex-col">
       <div className="mt-1 flex items-center justify-between">
         <CircleIconButton ariaLabel="Back to task" onClick={onBack}>
           <svg viewBox="0 0 20 20" className="h-4 w-4 text-pc-text/65" aria-hidden="true">

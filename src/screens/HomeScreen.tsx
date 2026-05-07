@@ -3,8 +3,6 @@ import { ModalShell } from '../components/ModalShell'
 import { SummaryPanel } from '../components/SummaryPanel'
 import { CircleIconButton } from '../ui/CircleIconButton'
 import { PulseIcon } from '../ui/PulseIcon'
-import { StatusBar } from '../ui/StatusBar'
-
 export function HomeScreen({
   displayName,
   taskName,
@@ -85,9 +83,7 @@ export function HomeScreen({
   }
 
   return (
-    <div className="flex min-h-[926px] flex-col">
-      <StatusBar />
-
+    <div className="flex min-h-dvh flex-col">
       <div className="mt-1 flex items-center justify-between">
         <CircleIconButton ariaLabel="Back to tasks" onClick={onBackToTasks}>
           <svg viewBox="0 0 20 20" className="h-4 w-4 text-pc-text/65" aria-hidden="true">
