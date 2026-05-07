@@ -154,7 +154,7 @@ export function TaskListScreen({
         ))}
       </div>
 
-      <div className="-mt-[100px] flex shrink-0 flex-col gap-2.5 pb-[max(1rem,env(safe-area-inset-bottom))] pt-0">
+      <div className="-mt-[500px] flex shrink-0 flex-col gap-2.5 pb-[max(1rem,env(safe-area-inset-bottom))] pt-0">
         <button
           type="button"
           onClick={() => {
