@@ -104,7 +104,8 @@ export function TaskListScreen({
         </div>
       </div>
 
-      <div className="mt-5 flex min-h-0 flex-1 flex-col gap-3 overflow-y-auto">
+      <div className="mt-5 flex min-h-0 flex-1 flex-col overflow-y-auto px-2">
+        <div className="mx-auto flex w-full max-w-[min(22rem,calc(100vw-2rem))] flex-col gap-3">
         {tasks.map((task, index) => (
           <div
             key={task.id}
@@ -152,9 +153,10 @@ export function TaskListScreen({
             </svg>
           </div>
         ))}
+        </div>
       </div>
 
-      <div className="-mt-5 flex shrink-0 flex-col gap-2.5 pb-[max(1rem,env(safe-area-inset-bottom))] pt-0">
+      <div className="-mt-5 mx-auto flex w-full max-w-[min(22rem,calc(100vw-2rem))] shrink-0 flex-col gap-2.5 px-2 pb-[max(1rem,env(safe-area-inset-bottom))] pt-0">
         <button
           type="button"
           onClick={() => {
@@ -162,7 +164,7 @@ export function TaskListScreen({
             setTaskGoalDraft('0')
             setCreateOpen(true)
           }}
-          className="rounded-xl2 bg-white px-5 py-3 text-[14px] font-semibold tracking-tightish text-pc-accent shadow-[12px_14px_28px_rgba(27,51,46,0.18),-10px_-10px_22px_rgba(255,255,255,0.75)] transition active:scale-[0.99]"
+          className="w-full rounded-xl2 bg-white px-5 py-3 text-[14px] font-semibold tracking-tightish text-pc-accent shadow-[12px_14px_28px_rgba(27,51,46,0.18),-10px_-10px_22px_rgba(255,255,255,0.75)] transition active:scale-[0.99]"
         >
           + 新建任务
         </button>
