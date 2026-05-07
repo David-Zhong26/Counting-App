@@ -1,4 +1,4 @@
-import { useCallback, useRef, useState, type CSSProperties } from 'react'
+import { useCallback, useMemo, useRef, useState, type CSSProperties } from 'react'
 import type { Task } from '../types/task'
 import { ModalShell } from '../components/ModalShell'
 
@@ -24,6 +24,7 @@ export function TaskListScreen({
   tasks,
   onSelectTask,
   onCreateTask,
+  onDeleteTask,
   onRenameTask,
   onSaveDisplayName,
   onLogout,
@@ -32,6 +33,7 @@ export function TaskListScreen({
   tasks: Task[]
   onSelectTask: (taskId: string) => void
   onCreateTask: (name: string, goal: number) => Promise<void>
+  onDeleteTask: (taskId: string) => Promise<void>
   onRenameTask: (taskId: string, name: string) => Promise<void>
   onSaveDisplayName: (name: string) => Promise<void>
   onLogout: () => void
@@ -44,10 +46,21 @@ export function TaskListScreen({
   const [taskGoalDraft, setTaskGoalDraft] = useState('0')
   const [nameDraft, setNameDraft] = useState(displayName ?? '')
   const [busy, setBusy] = useState(false)
+  const [deleteTaskTarget, setDeleteTaskTarget] = useState<Task | null>(null)
 
   const pendingNavRef = useRef<{ taskId: string; timer: ReturnType<typeof setTimeout> } | null>(
     null,
   )
+
+  const swipeRef = useRef<{
+    taskId: string
+    startX: number
+    startY: number
+    dx: number
+    active: boolean
+    moved: boolean
+  } | null>(null)
+  const [openSwipeId, setOpenSwipeId] = useState<string | null>(null)
 
   const showName = displayName?.trim() || null
   const greetingLine = `你好呀～${showName ?? '朋友'}`
@@ -81,6 +94,45 @@ export function TaskListScreen({
     [onSelectTask],
   )
 
+  const closeSwipe = useCallback(() => setOpenSwipeId(null), [])
+
+  const swipeHandlers = useMemo(() => {
+    function onPointerDown(taskId: string, e: React.PointerEvent) {
+      if (e.pointerType === 'mouse' && e.button !== 0) return
+      swipeRef.current = {
+        taskId,
+        startX: e.clientX,
+        startY: e.clientY,
+        dx: 0,
+        active: true,
+        moved: false,
+      }
+    }
+
+    function onPointerMove(e: React.PointerEvent) {
+      const s = swipeRef.current
+      if (!s?.active) return
+      const dx = e.clientX - s.startX
+      const dy = e.clientY - s.startY
+      if (!s.moved && Math.abs(dx) < 6 && Math.abs(dy) < 6) return
+      if (!s.moved) s.moved = true
+      if (Math.abs(dy) > Math.abs(dx)) return
+      e.preventDefault()
+      s.dx = Math.max(0, Math.min(96, dx))
+      if (s.dx > 0) setOpenSwipeId(s.taskId)
+    }
+
+    function onPointerUp() {
+      const s = swipeRef.current
+      if (!s) return
+      const keepOpen = s.dx > 56
+      setOpenSwipeId(keepOpen ? s.taskId : null)
+      swipeRef.current = null
+    }
+
+    return { onPointerDown, onPointerMove, onPointerUp }
+  }, [])
+
   const n = tasks.length
 
   return (
@@ -106,50 +158,79 @@ export function TaskListScreen({
 
       <div className="mt-[calc(1.25rem+30px)] flex min-h-0 flex-1 flex-col gap-3 overflow-y-auto">
         {tasks.map((task, index) => (
-          <div
-            key={task.id}
-            role="button"
-            tabIndex={0}
-            onKeyDown={(e) => {
-              if (e.key === 'Enter' || e.key === ' ') {
-                e.preventDefault()
-                onRowActivate(task.id)
-              }
-            }}
-            onClick={() => onRowActivate(task.id)}
-            style={taskCardStyle(index, n)}
-            className="flex w-full cursor-pointer items-center justify-between rounded-xl3 border px-5 py-4 text-left shadow-neuSm transition active:scale-[0.995]"
-          >
-            <div className="min-w-0 flex-1">
-              <div
-                className="text-[17px] font-semibold tracking-tightish text-pc-text"
-                onDoubleClick={(e) => {
-                  e.stopPropagation()
-                  flushNavigate()
-                  setRenameDraft(task.name)
-                  setRenameTask(task)
-                }}
-              >
-                {task.name}
-              </div>
-              <div className="mt-1 text-[12px] font-medium text-pc-text/55">
-                今日 · {task.todayCount} · 连续 {task.streak} 天 · 总计 {task.goal}
-              </div>
-            </div>
-            <svg
-              viewBox="0 0 20 20"
-              className="h-5 w-5 shrink-0 text-pc-text/45"
-              aria-hidden="true"
+          <div key={task.id} className="relative">
+            <button
+              type="button"
+              onClick={() => {
+                closeSwipe()
+                setDeleteTaskTarget(task)
+              }}
+              className={[
+                'absolute left-0 top-0 h-full rounded-xl3 px-4 text-[13px] font-semibold',
+                'bg-[#e66b6b] text-white shadow-neuSm',
+                openSwipeId === task.id ? 'opacity-100' : 'pointer-events-none opacity-0',
+              ].join(' ')}
+              aria-label={`Delete ${task.name}`}
             >
-              <path
-                d="M7.6 4.4 13 10l-5.4 5.6"
-                fill="none"
-                stroke="currentColor"
-                strokeWidth="2.2"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-              />
-            </svg>
+              删除
+            </button>
+
+            <div
+              role="button"
+              tabIndex={0}
+              onKeyDown={(e) => {
+                if (e.key === 'Enter' || e.key === ' ') {
+                  e.preventDefault()
+                  closeSwipe()
+                  onRowActivate(task.id)
+                }
+              }}
+              onClick={() => {
+                if (openSwipeId === task.id) return
+                onRowActivate(task.id)
+              }}
+              onPointerDown={(e) => swipeHandlers.onPointerDown(task.id, e)}
+              onPointerMove={swipeHandlers.onPointerMove}
+              onPointerUp={swipeHandlers.onPointerUp}
+              onPointerCancel={swipeHandlers.onPointerUp}
+              style={{
+                ...taskCardStyle(index, n),
+                transform: openSwipeId === task.id ? 'translateX(96px)' : 'translateX(0px)',
+              }}
+              className="flex w-full cursor-pointer items-center justify-between rounded-xl3 border px-5 py-4 text-left shadow-neuSm transition-[transform] duration-200 active:scale-[0.995]"
+            >
+              <div className="min-w-0 flex-1">
+                <div
+                  className="text-[17px] font-semibold tracking-tightish text-pc-text"
+                  onDoubleClick={(e) => {
+                    e.stopPropagation()
+                    closeSwipe()
+                    flushNavigate()
+                    setRenameDraft(task.name)
+                    setRenameTask(task)
+                  }}
+                >
+                  {task.name}
+                </div>
+                <div className="mt-1 text-[12px] font-medium text-pc-text/55">
+                  今日 · {task.todayCount} · 连续 {task.streak} 天 · 总计 {task.goal}
+                </div>
+              </div>
+              <svg
+                viewBox="0 0 20 20"
+                className="h-5 w-5 shrink-0 text-pc-text/45"
+                aria-hidden="true"
+              >
+                <path
+                  d="M7.6 4.4 13 10l-5.4 5.6"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="2.2"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                />
+              </svg>
+            </div>
           </div>
         ))}
       </div>
@@ -312,6 +393,46 @@ export function TaskListScreen({
               className="rounded-xl2 border border-pc-text/14 bg-white px-3 py-2.5 text-[14px] font-medium text-pc-text outline-none ring-pc-accent/25 focus:border-pc-accent/35 focus:ring-2"
             />
           </label>
+        </ModalShell>
+      )}
+
+      {deleteTaskTarget && (
+        <ModalShell
+          title="删除任务？"
+          onClose={() => !busy && setDeleteTaskTarget(null)}
+          footer={
+            <div className="flex gap-3">
+              <button
+                type="button"
+                disabled={busy}
+                onClick={() => setDeleteTaskTarget(null)}
+                className="flex-1 rounded-xl2 bg-pc-bg/80 py-2.5 text-[13px] font-semibold text-pc-text/70 shadow-neuInset"
+              >
+                取消
+              </button>
+              <button
+                type="button"
+                disabled={busy}
+                onClick={async () => {
+                  setBusy(true)
+                  try {
+                    await onDeleteTask(deleteTaskTarget.id)
+                    setDeleteTaskTarget(null)
+                    setOpenSwipeId(null)
+                  } finally {
+                    setBusy(false)
+                  }
+                }}
+                className="flex-1 rounded-xl2 bg-[#e66b6b] py-2.5 text-[13px] font-semibold text-white shadow-[12px_14px_28px_rgba(27,51,46,0.14)]"
+              >
+                {busy ? '删除中…' : '删除'}
+              </button>
+            </div>
+          }
+        >
+          <div className="text-[13px] font-medium leading-relaxed text-pc-text/70">
+            将删除「{deleteTaskTarget.name}」以及它的所有记录。
+          </div>
         </ModalShell>
       )}
     </div>

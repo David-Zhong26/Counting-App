@@ -162,6 +162,16 @@ export async function updateTaskName(userId: string, taskId: string, name: strin
   if (error) throw error
 }
 
+export async function deleteTask(userId: string, taskId: string) {
+  const { error } = await supabase
+    .from('tasks')
+    .delete()
+    .eq('id', taskId)
+    .eq('user_id', userId)
+
+  if (error) throw error
+}
+
 export async function upsertTodayCount(userId: string, taskId: string, count: number) {
   const todayStr = toLocalDateString(new Date())
   const v = Math.max(0, Math.floor(count))

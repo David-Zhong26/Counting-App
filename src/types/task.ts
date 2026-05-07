@@ -10,6 +10,8 @@ export type Task = {
   weeklyPercent: number
   weeklyChecks: WeekChecks
   activity: ActivityRow[]
+  /** Last ~120 days of counts keyed by YYYY-MM-DD. */
+  dailyCounts: Record<string, number>
   /** Days this calendar week with count above zero (Mon–Sun). */
   weekDaysHit?: number
 }

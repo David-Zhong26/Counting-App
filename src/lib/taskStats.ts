@@ -118,6 +118,7 @@ export function buildTaskView(args: {
     weeklyPercent: percent,
     weeklyChecks: checks,
     activity,
+    dailyCounts: Object.fromEntries(countByDate.entries()),
     weekDaysHit: daysHit,
   }
 }

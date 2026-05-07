@@ -1,24 +1,25 @@
 import type { ActivityRow } from '../components/RecentActivityList'
-import type { WeekChecks } from '../components/WeeklyCheckRow'
+import { MonthCalendar } from '../components/MonthCalendar'
 import { ProgressRing } from '../components/ProgressRing'
 import { RecentActivityList } from '../components/RecentActivityList'
-import { WeeklyCheckRow } from '../components/WeeklyCheckRow'
 import { CircleIconButton } from '../ui/CircleIconButton'
 export function OverviewScreen({
   displayName,
   taskName,
-  weeklyChecks,
   weeklyPercent,
   weekDaysHit,
   activity,
+  dailyCounts,
+  todayStr,
   onBack,
 }: {
   displayName: string | null
   taskName: string
-  weeklyChecks: WeekChecks
   weeklyPercent: number
   weekDaysHit: number
   activity: ActivityRow[]
+  dailyCounts: Record<string, number>
+  todayStr: string
   onBack: () => void
 }) {
   const greetingLine = `你好呀～${displayName?.trim() || '朋友'}`
@@ -48,7 +49,7 @@ export function OverviewScreen({
       </div>
 
       <div className="mt-8 space-y-5">
-        <WeeklyCheckRow checks={weeklyChecks} />
+        <MonthCalendar dailyCounts={dailyCounts} todayStr={todayStr} />
         <ProgressRing percent={weeklyPercent} daysHit={weekDaysHit} />
         <RecentActivityList rows={activity} />
       </div>

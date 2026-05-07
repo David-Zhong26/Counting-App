@@ -6,6 +6,7 @@ import type { ActivityRow } from './components/RecentActivityList'
 import type { Task } from './types/task'
 import {
   createTask,
+  deleteTask,
   fetchDisplayName,
   loadPulseTasks,
   saveDisplayName,
@@ -15,6 +16,7 @@ import {
 } from './lib/pulseData'
 import { toErrorMessage } from './lib/toErrorMessage'
 import { supabase } from './lib/supabase.js'
+import { toLocalDateString } from './lib/dateUtils'
 
 export function PulseApp({ userId }: { userId: string }) {
   const [tasks, setTasks] = useState<Task[]>([])
@@ -171,6 +173,10 @@ export function PulseApp({ userId }: { userId: string }) {
             await createTask(userId, name, goal)
             await refresh()
           }}
+          onDeleteTask={async (taskId) => {
+            await deleteTask(userId, taskId)
+            await refresh()
+          }}
           onRenameTask={async (taskId, name) => {
             await updateTaskName(userId, taskId, name)
             await refresh()
@@ -216,10 +222,11 @@ export function PulseApp({ userId }: { userId: string }) {
         <OverviewScreen
           displayName={displayName}
           taskName={selected.name}
-          weeklyChecks={selected.weeklyChecks}
           weeklyPercent={selected.weeklyPercent}
           weekDaysHit={selected.weekDaysHit ?? 0}
           activity={activitySynced}
+          dailyCounts={selected.dailyCounts}
+          todayStr={toLocalDateString(new Date())}
           onBack={() => setScreen('detail')}
         />
       )}
