@@ -126,25 +126,14 @@ export function HomeScreen({
         {greetingLine}
       </div>
 
-      <div className="mt-3 flex flex-col items-center text-center">
-        <div className="grid h-14 w-14 place-items-center overflow-hidden rounded-2xl bg-pc-surface/70 shadow-neuInset">
-          <img
-            src="/logo.png"
-            alt=""
-            width={44}
-            height={44}
-            className="h-11 w-11 object-contain"
-            decoding="async"
-          />
-        </div>
-
+      <div className="mt-4 flex flex-col items-center text-center">
         <button
           type="button"
           onDoubleClick={() => {
             setTaskNameDraft(taskName)
             setTaskNameOpen(true)
           }}
-          className="mt-5 max-w-[min(20rem,calc(100vw-2rem))] cursor-pointer rounded-2xl border border-white/45 bg-white/30 px-5 py-2.5 shadow-[0_4px_24px_rgba(27,51,46,0.08)] outline-none backdrop-blur-md transition hover:bg-white/40"
+          className="max-w-[min(20rem,calc(100vw-2rem))] cursor-pointer rounded-2xl border border-white/45 bg-white/30 px-5 py-2.5 shadow-[0_4px_24px_rgba(27,51,46,0.08)] outline-none backdrop-blur-md transition hover:bg-white/40"
           title="双击改名"
           aria-label={`Task ${taskName}. Double-click to rename.`}
         >
@@ -207,17 +196,13 @@ export function HomeScreen({
         <div className={`mt-3 ${enCaptionClass}`}>Today</div>
 
         <button
+          key={popTick}
           type="button"
           onClick={handleIncrement}
-          className="mt-6 grid h-28 w-28 place-items-center rounded-full bg-white shadow-[12px_14px_28px_rgba(27,51,46,0.18),-10px_-10px_22px_rgba(255,255,255,0.75)] transition active:scale-[0.99]"
+          className={`mt-6 grid h-28 w-28 place-items-center rounded-full bg-white shadow-[12px_14px_28px_rgba(27,51,46,0.18),-10px_-10px_22px_rgba(255,255,255,0.75)] transition active:scale-[0.99] ${popTick > 0 ? 'animate-pc-pop' : ''}`}
           aria-label="Add one"
         >
-          <span
-            key={popTick}
-            className="animate-pc-pop inline-block text-[34px] font-semibold tracking-tightish text-pc-accent"
-          >
-            +1
-          </span>
+          <span className="text-[34px] font-semibold tracking-tightish text-pc-accent">+1</span>
         </button>
 
         <div className="mt-6 w-full">
