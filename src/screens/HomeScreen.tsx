@@ -48,8 +48,8 @@ export function HomeScreen({
   const [taskNameDraft, setTaskNameDraft] = useState(taskName)
   const [taskNameBusy, setTaskNameBusy] = useState(false)
 
-  const [popTick, setPopTick] = useState(0)
-  const [popTick3, setPopTick3] = useState(0)
+  const [pop1, setPop1] = useState(false)
+  const [pop3, setPop3] = useState(false)
 
   const greetingLine = `你好呀～${displayName?.trim() || '朋友'}`
 
@@ -93,12 +93,14 @@ export function HomeScreen({
 
   function handleIncrement() {
     onIncrement()
-    setPopTick((t) => t + 1)
+    setPop1(false)
+    requestAnimationFrame(() => setPop1(true))
   }
 
   function handleIncrementBy3() {
     onIncrementBy3()
-    setPopTick3((t) => t + 1)
+    setPop3(false)
+    requestAnimationFrame(() => setPop3(true))
   }
 
   return (
@@ -205,19 +207,19 @@ export function HomeScreen({
 
         <div className="mt-6 flex flex-row items-center justify-center gap-4">
           <button
-            key={popTick}
             type="button"
             onClick={handleIncrement}
-            className={`grid h-28 w-28 shrink-0 place-items-center rounded-full bg-white shadow-[12px_14px_28px_rgba(27,51,46,0.18),-10px_-10px_22px_rgba(255,255,255,0.75)] transition active:scale-[0.99] ${popTick > 0 ? 'animate-pc-pop' : ''}`}
+            onAnimationEnd={() => setPop1(false)}
+            className={`grid h-28 w-28 shrink-0 place-items-center rounded-full bg-white shadow-[12px_14px_28px_rgba(27,51,46,0.18),-10px_-10px_22px_rgba(255,255,255,0.75)] transition active:scale-[0.99] ${pop1 ? 'animate-pc-pop' : ''}`}
             aria-label="Add one"
           >
             <span className="text-[34px] font-semibold tracking-tightish text-pc-accent">+1</span>
           </button>
           <button
-            key={popTick3}
             type="button"
             onClick={handleIncrementBy3}
-            className={`grid h-28 w-28 shrink-0 place-items-center rounded-full bg-white shadow-[12px_14px_28px_rgba(27,51,46,0.18),-10px_-10px_22px_rgba(255,255,255,0.75)] transition active:scale-[0.99] ${popTick3 > 0 ? 'animate-pc-pop' : ''}`}
+            onAnimationEnd={() => setPop3(false)}
+            className={`grid h-28 w-28 shrink-0 place-items-center rounded-full bg-white shadow-[12px_14px_28px_rgba(27,51,46,0.18),-10px_-10px_22px_rgba(255,255,255,0.75)] transition active:scale-[0.99] ${pop3 ? 'animate-pc-pop' : ''}`}
             aria-label="Add three"
           >
             <span className="text-[34px] font-semibold tracking-tightish text-pc-accent">+3</span>
