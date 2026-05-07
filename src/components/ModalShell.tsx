@@ -18,7 +18,7 @@ export function ModalShell({
       aria-modal="true"
       aria-labelledby="modal-title"
     >
-      <div className="relative w-full max-w-[300px] rounded-xl3 bg-pc-surface/95 px-5 py-5 shadow-neu">
+      <div className="relative w-full max-w-[300px] rounded-xl3 border border-pc-text/10 bg-white px-5 py-5 shadow-[12px_14px_32px_rgba(27,51,46,0.12)]">
         <button
           type="button"
           onClick={onClose}

@@ -26,7 +26,7 @@ export function ProgressRing({
           <div className="text-[13px] font-semibold tracking-tightish text-pc-text">
             Weekly Progress
           </div>
-          <div className="mt-1 text-[12px] font-medium text-pc-text/60">{caption} ✦</div>
+          <div className="mt-1 text-[12px] font-medium text-pc-text/60">{caption}</div>
         </div>
 
         <div className="relative">

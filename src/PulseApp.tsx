@@ -10,6 +10,7 @@ import {
   loadPulseTasks,
   saveDisplayName,
   updateTaskGoal,
+  updateTaskName,
   upsertTodayCount,
 } from './lib/pulseData'
 import { toErrorMessage } from './lib/toErrorMessage'
@@ -95,12 +96,12 @@ export function PulseApp({ userId }: { userId: string }) {
 
   const frameLabel =
     screen === 'list'
-      ? '小宝数数 · Tasks'
+      ? 'Tasks'
       : screen === 'detail' && selected
-        ? `小宝数数 · ${selected.name}`
+        ? selected.name
         : selected
-          ? `小宝数数 · ${selected.name} · Overview`
-          : '小宝数数'
+          ? `${selected.name} · Overview`
+          : 'App'
 
   if (loading) {
     return (
@@ -170,6 +171,10 @@ export function PulseApp({ userId }: { userId: string }) {
             await createTask(userId, name, goal)
             await refresh()
           }}
+          onRenameTask={async (taskId, name) => {
+            await updateTaskName(userId, taskId, name)
+            await refresh()
+          }}
           onSaveDisplayName={async (name) => {
             await saveDisplayName(userId, name)
             await refresh()
@@ -180,6 +185,7 @@ export function PulseApp({ userId }: { userId: string }) {
 
       {screen === 'detail' && selected && (
         <HomeScreen
+          displayName={displayName}
           taskName={selected.name}
           todayCount={selected.todayCount}
           goal={selected.goal}
@@ -193,6 +199,10 @@ export function PulseApp({ userId }: { userId: string }) {
             await updateTaskGoal(userId, selected.id, g)
             await refresh()
           }}
+          onUpdateTaskName={async (name) => {
+            await updateTaskName(userId, selected.id, name)
+            await refresh()
+          }}
           onBackToTasks={() => {
             setScreen('list')
             setSelectedId(null)
@@ -203,6 +213,7 @@ export function PulseApp({ userId }: { userId: string }) {
 
       {screen === 'overview' && selected && (
         <OverviewScreen
+          displayName={displayName}
           taskName={selected.name}
           weeklyChecks={selected.weeklyChecks}
           weeklyPercent={selected.weeklyPercent}

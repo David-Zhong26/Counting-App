@@ -36,8 +36,7 @@ export function AuthScreen() {
   return (
     <div className="flex min-h-[926px] flex-col px-2">
       <div className="mt-16 text-center">
-        <div className="text-[26px] font-semibold tracking-tightish text-pc-text">小宝数数</div>
-        <div className="mt-1 text-[13px] font-medium text-pc-text/60">
+        <div className="text-[22px] font-semibold tracking-tightish text-pc-text">
           {mode === 'signup' ? 'Create your account' : 'Welcome back'}
         </div>
       </div>
@@ -52,7 +51,7 @@ export function AuthScreen() {
               required
               value={email}
               onChange={(e) => setEmail(e.target.value)}
-              className="rounded-xl2 border-0 bg-pc-bg/80 px-4 py-3 text-[15px] font-medium text-pc-text shadow-neuInset outline-none ring-pc-accent/35 focus:ring-2"
+              className="rounded-xl2 border border-pc-text/18 bg-white px-4 py-3 text-[15px] font-medium text-pc-text shadow-none outline-none ring-pc-accent/30 focus:border-pc-accent/40 focus:ring-2"
             />
           </label>
           <label className="flex flex-col gap-1.5 text-left">
@@ -66,7 +65,7 @@ export function AuthScreen() {
               minLength={6}
               value={password}
               onChange={(e) => setPassword(e.target.value)}
-              className="rounded-xl2 border-0 bg-pc-bg/80 px-4 py-3 text-[15px] font-medium text-pc-text shadow-neuInset outline-none ring-pc-accent/35 focus:ring-2"
+              className="rounded-xl2 border border-pc-text/18 bg-white px-4 py-3 text-[15px] font-medium text-pc-text shadow-none outline-none ring-pc-accent/30 focus:border-pc-accent/40 focus:ring-2"
             />
           </label>
 

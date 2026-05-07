@@ -8,6 +8,7 @@ import { CircleIconButton } from '../ui/CircleIconButton'
 import { StatusBar } from '../ui/StatusBar'
 
 export function OverviewScreen({
+  displayName,
   taskName,
   weeklyChecks,
   weeklyPercent,
@@ -15,6 +16,7 @@ export function OverviewScreen({
   activity,
   onBack,
 }: {
+  displayName: string | null
   taskName: string
   weeklyChecks: WeekChecks
   weeklyPercent: number
@@ -22,6 +24,7 @@ export function OverviewScreen({
   activity: ActivityRow[]
   onBack: () => void
 }) {
+  const greetingLine = `你好呀～${displayName?.trim() || '朋友'}`
   return (
     <div className="flex min-h-[926px] flex-col">
       <StatusBar />
@@ -43,8 +46,8 @@ export function OverviewScreen({
       </div>
 
       <div className="mt-5 text-center">
-        <div className="text-[28px] font-semibold tracking-tightish text-pc-text">Overview</div>
-        <div className="mt-1 text-[13px] font-medium text-pc-text/60">
+        <div className="text-[17px] font-semibold tracking-tightish text-pc-text">{greetingLine}</div>
+        <div className="mt-2 text-[13px] font-medium text-pc-text/60">
           {taskName} · Your week at a glance.
         </div>
       </div>

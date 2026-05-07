@@ -6,6 +6,7 @@ import { PulseIcon } from '../ui/PulseIcon'
 import { StatusBar } from '../ui/StatusBar'
 
 export function HomeScreen({
+  displayName,
   taskName,
   todayCount,
   goal,
@@ -14,9 +15,11 @@ export function HomeScreen({
   onDecrement,
   onSetCount,
   onUpdateGoal,
+  onUpdateTaskName,
   onBackToTasks,
   onGoOverview,
 }: {
+  displayName: string | null
   taskName: string
   todayCount: number
   goal: number
@@ -25,6 +28,7 @@ export function HomeScreen({
   onDecrement: () => void
   onSetCount: (n: number) => void
   onUpdateGoal: (goal: number) => Promise<void>
+  onUpdateTaskName: (name: string) => Promise<void>
   onBackToTasks: () => void
   onGoOverview: () => void
 }) {
@@ -36,6 +40,12 @@ export function HomeScreen({
   const [goalDraft, setGoalDraft] = useState(String(goal))
   const [goalBusy, setGoalBusy] = useState(false)
 
+  const [taskNameOpen, setTaskNameOpen] = useState(false)
+  const [taskNameDraft, setTaskNameDraft] = useState(taskName)
+  const [taskNameBusy, setTaskNameBusy] = useState(false)
+
+  const greetingLine = `你好呀～${displayName?.trim() || '朋友'}`
+
   useEffect(() => {
     if (!editing) {
       // eslint-disable-next-line react-hooks/set-state-in-effect -- sync draft when not actively editing
@@ -46,6 +56,10 @@ export function HomeScreen({
   useEffect(() => {
     if (!goalOpen) setGoalDraft(String(goal))
   }, [goal, goalOpen])
+
+  useEffect(() => {
+    if (!taskNameOpen) setTaskNameDraft(taskName)
+  }, [taskName, taskNameOpen])
 
   useEffect(() => {
     if (editing && inputRef.current) {
@@ -101,36 +115,57 @@ export function HomeScreen({
         </CircleIconButton>
       </div>
 
-      <div className="mt-2 flex flex-col items-center text-center">
+      <div className="mt-2 px-2 text-center text-[15px] font-semibold tracking-tightish text-pc-text">
+        {greetingLine}
+      </div>
+
+      <div className="mt-3 flex flex-col items-center text-center">
         <div className="grid h-12 w-12 place-items-center rounded-full bg-pc-surface/70 shadow-neuInset">
           <PulseIcon className="h-6 w-6 text-pc-accent/90" />
         </div>
 
-        <div className="mt-5 max-w-[18rem] text-[26px] font-semibold tracking-tightish text-pc-text">
+        <button
+          type="button"
+          onDoubleClick={() => {
+            setTaskNameDraft(taskName)
+            setTaskNameOpen(true)
+          }}
+          className="mt-5 max-w-[18rem] cursor-pointer border-0 bg-transparent p-0 text-[26px] font-semibold tracking-tightish text-pc-text outline-none"
+          title="双击改名"
+          aria-label={`Task ${taskName}. Double-click to rename.`}
+        >
           {taskName}
-        </div>
+        </button>
         <div className="mt-1 text-[13px] font-medium text-pc-text/60">
           Small steps, lasting change.
         </div>
       </div>
 
-      <div className="mt-14 flex flex-1 flex-col items-center">
-        <div className="relative inline-block pb-7">
+      <div className="mt-12 flex flex-1 flex-col items-center">
+        <div className="relative pb-7">
           {editing ? (
-            <input
-              ref={inputRef}
-              type="text"
-              inputMode="numeric"
-              aria-label="Edit today count"
-              value={draft}
-              onChange={(e) => setDraft(e.target.value.replace(/\D/g, ''))}
-              onBlur={commitEdit}
-              onKeyDown={(e) => {
-                if (e.key === 'Enter') commitEdit()
-                if (e.key === 'Escape') cancelEdit()
-              }}
-              className="max-w-[min(320px,calc(100vw-4rem))] border-0 bg-transparent text-center text-[86px] font-semibold leading-none tracking-tightish text-pc-accent tabular-nums outline-none ring-pc-accent/35 focus:ring-2"
-            />
+            <div className="relative inline-grid max-w-[min(320px,calc(100vw-4rem))] place-items-center rounded-xl px-1 ring-2 ring-pc-accent/35">
+              <span
+                aria-hidden
+                className="col-start-1 row-start-1 px-1 text-[86px] font-semibold leading-none tracking-tightish tabular-nums opacity-0"
+              >
+                {draft.length ? draft : '0'}
+              </span>
+              <input
+                ref={inputRef}
+                type="text"
+                inputMode="numeric"
+                aria-label="Edit today count"
+                value={draft}
+                onChange={(e) => setDraft(e.target.value.replace(/\D/g, ''))}
+                onBlur={commitEdit}
+                onKeyDown={(e) => {
+                  if (e.key === 'Enter') commitEdit()
+                  if (e.key === 'Escape') cancelEdit()
+                }}
+                className="col-start-1 row-start-1 min-w-0 border-0 bg-transparent text-center text-[86px] font-semibold leading-none tracking-tightish text-pc-accent tabular-nums outline-none"
+              />
+            </div>
           ) : (
             <button
               type="button"
@@ -140,7 +175,7 @@ export function HomeScreen({
               }}
               className="cursor-pointer border-0 bg-transparent p-0 text-[86px] font-semibold leading-none tracking-tightish text-pc-accent tabular-nums outline-none"
               aria-label={`Today count ${todayCount}. Double-click to edit.`}
-              title="Double-click to edit"
+              title="双击修改数字"
             >
               {todayCount}
             </button>
@@ -220,7 +255,51 @@ export function HomeScreen({
               inputMode="numeric"
               value={goalDraft}
               onChange={(e) => setGoalDraft(e.target.value)}
-              className="rounded-xl2 border-0 bg-pc-bg/80 px-3 py-2.5 text-[14px] font-medium text-pc-text shadow-neuInset outline-none ring-pc-accent/35 focus:ring-2"
+              className="rounded-xl2 border border-pc-text/14 bg-white px-3 py-2.5 text-[14px] font-medium text-pc-text outline-none ring-pc-accent/25 focus:border-pc-accent/35 focus:ring-2"
+            />
+          </label>
+        </ModalShell>
+      )}
+
+      {taskNameOpen && (
+        <ModalShell
+          title="重命名任务"
+          onClose={() => !taskNameBusy && setTaskNameOpen(false)}
+          footer={
+            <div className="flex gap-3">
+              <button
+                type="button"
+                disabled={taskNameBusy}
+                onClick={() => setTaskNameOpen(false)}
+                className="flex-1 rounded-xl2 bg-pc-bg/80 py-2.5 text-[13px] font-semibold text-pc-text/70 shadow-neuInset"
+              >
+                取消
+              </button>
+              <button
+                type="button"
+                disabled={taskNameBusy || !taskNameDraft.trim()}
+                onClick={async () => {
+                  setTaskNameBusy(true)
+                  try {
+                    await onUpdateTaskName(taskNameDraft)
+                    setTaskNameOpen(false)
+                  } finally {
+                    setTaskNameBusy(false)
+                  }
+                }}
+                className="flex-1 rounded-xl2 bg-white py-2.5 text-[13px] font-semibold text-pc-accent shadow-[12px_14px_28px_rgba(27,51,46,0.14)]"
+              >
+                {taskNameBusy ? '保存中…' : '保存'}
+              </button>
+            </div>
+          }
+        >
+          <label className="flex flex-col gap-1.5 text-left">
+            <span className="text-[11px] font-semibold tracking-[0.14em] text-pc-text/55">任务名称</span>
+            <input
+              value={taskNameDraft}
+              onChange={(e) => setTaskNameDraft(e.target.value)}
+              className="rounded-xl2 border border-pc-text/14 bg-white px-3 py-2.5 text-[14px] font-medium text-pc-text outline-none ring-pc-accent/25 focus:border-pc-accent/35 focus:ring-2"
             />
           </label>
         </ModalShell>
