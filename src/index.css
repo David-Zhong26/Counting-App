@@ -38,3 +38,19 @@ body {
 ::selection {
   background: rgba(107, 144, 136, 0.28);
 }
+
+@keyframes pc-pop {
+  0% {
+    transform: scale(1);
+  }
+  45% {
+    transform: scale(1.1);
+  }
+  100% {
+    transform: scale(1);
+  }
+}
+
+.animate-pc-pop {
+  animation: pc-pop 0.38s ease-out;
+}

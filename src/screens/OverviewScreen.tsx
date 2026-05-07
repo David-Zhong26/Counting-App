@@ -2,7 +2,6 @@ import type { ActivityRow } from '../components/RecentActivityList'
 import type { WeekChecks } from '../components/WeeklyCheckRow'
 import { ProgressRing } from '../components/ProgressRing'
 import { RecentActivityList } from '../components/RecentActivityList'
-import { ReflectionCard } from '../components/ReflectionCard'
 import { WeeklyCheckRow } from '../components/WeeklyCheckRow'
 import { CircleIconButton } from '../ui/CircleIconButton'
 export function OverviewScreen({
@@ -51,7 +50,6 @@ export function OverviewScreen({
       <div className="mt-8 space-y-5">
         <WeeklyCheckRow checks={weeklyChecks} />
         <ProgressRing percent={weeklyPercent} daysHit={weekDaysHit} />
-        <ReflectionCard text="Consistency is built one decision at a time." />
         <RecentActivityList rows={activity} />
       </div>
     </div>

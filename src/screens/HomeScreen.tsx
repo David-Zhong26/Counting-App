@@ -3,6 +3,10 @@ import { ModalShell } from '../components/ModalShell'
 import { SummaryPanel } from '../components/SummaryPanel'
 import { CircleIconButton } from '../ui/CircleIconButton'
 
+/** Matches TODAY / GOAL / STREAK label typography */
+const enCaptionClass =
+  'text-[12px] font-medium tracking-[0.18em] text-pc-text/55 uppercase'
+
 export function HomeScreen({
   displayName,
   taskName,
@@ -42,6 +46,8 @@ export function HomeScreen({
   const [taskNameDraft, setTaskNameDraft] = useState(taskName)
   const [taskNameBusy, setTaskNameBusy] = useState(false)
 
+  const [popTick, setPopTick] = useState(0)
+
   const greetingLine = `你好呀～${displayName?.trim() || '朋友'}`
 
   useEffect(() => {
@@ -80,6 +86,11 @@ export function HomeScreen({
   function cancelEdit() {
     setDraft(String(todayCount))
     setEditing(false)
+  }
+
+  function handleIncrement() {
+    onIncrement()
+    setPopTick((t) => t + 1)
   }
 
   return (
@@ -133,18 +144,18 @@ export function HomeScreen({
             setTaskNameDraft(taskName)
             setTaskNameOpen(true)
           }}
-          className="mt-5 max-w-[18rem] cursor-pointer border-0 bg-transparent p-0 text-[26px] font-semibold tracking-tightish text-pc-text outline-none"
+          className="mt-5 max-w-[min(20rem,calc(100vw-2rem))] cursor-pointer rounded-2xl border border-white/45 bg-white/30 px-5 py-2.5 shadow-[0_4px_24px_rgba(27,51,46,0.08)] outline-none backdrop-blur-md transition hover:bg-white/40"
           title="双击改名"
           aria-label={`Task ${taskName}. Double-click to rename.`}
         >
-          {taskName}
+          <span className="text-[26px] font-semibold tracking-tightish text-pc-text">{taskName}</span>
         </button>
-        <div className="mt-1 text-[13px] font-medium text-pc-text/60">
+        <p className={`mt-3 max-w-[18rem] px-2 ${enCaptionClass}`}>
           Small steps, lasting change.
-        </div>
+        </p>
       </div>
 
-      <div className="mt-12 flex flex-1 flex-col items-center">
+      <div className="mt-8 flex flex-1 flex-col items-center pb-4">
         <div className="relative pb-7">
           {editing ? (
             <div className="relative inline-grid max-w-[min(320px,calc(100vw-4rem))] place-items-center rounded-xl px-1 ring-2 ring-pc-accent/35">
@@ -193,20 +204,23 @@ export function HomeScreen({
             −1
           </button>
         </div>
-        <div className="mt-3 text-[12px] font-semibold tracking-[0.26em] text-pc-text/50">
-          TODAY
-        </div>
+        <div className={`mt-3 ${enCaptionClass}`}>Today</div>
 
         <button
           type="button"
-          onClick={onIncrement}
-          className="mt-10 grid h-28 w-28 place-items-center rounded-full bg-white shadow-[12px_14px_28px_rgba(27,51,46,0.18),-10px_-10px_22px_rgba(255,255,255,0.75)] transition active:scale-[0.99]"
+          onClick={handleIncrement}
+          className="mt-6 grid h-28 w-28 place-items-center rounded-full bg-white shadow-[12px_14px_28px_rgba(27,51,46,0.18),-10px_-10px_22px_rgba(255,255,255,0.75)] transition active:scale-[0.99]"
           aria-label="Add one"
         >
-          <span className="text-[34px] font-semibold tracking-tightish text-pc-accent">+1</span>
+          <span
+            key={popTick}
+            className="animate-pc-pop inline-block text-[34px] font-semibold tracking-tightish text-pc-accent"
+          >
+            +1
+          </span>
         </button>
 
-        <div className="mt-auto w-full">
+        <div className="mt-6 w-full">
           <SummaryPanel
             today={todayCount}
             goal={goal}
@@ -218,7 +232,7 @@ export function HomeScreen({
 
       {goalOpen && (
         <ModalShell
-          title="每日目标"
+          title="总计"
           onClose={() => !goalBusy && setGoalOpen(false)}
           footer={
             <div className="flex gap-3">
@@ -251,7 +265,7 @@ export function HomeScreen({
           }
         >
           <label className="flex flex-col gap-1.5 text-left">
-            <span className="text-[11px] font-semibold tracking-[0.14em] text-pc-text/55">目标次数（可为 0）</span>
+            <span className="text-[11px] font-semibold tracking-[0.14em] text-pc-text/55">总计（可为 0）</span>
             <input
               type="number"
               min={0}

@@ -1,6 +1,23 @@
-import { useCallback, useRef, useState } from 'react'
+import { useCallback, useRef, useState, type CSSProperties } from 'react'
 import type { Task } from '../types/task'
 import { ModalShell } from '../components/ModalShell'
+
+function taskCardStyle(index: number, total: number): CSSProperties {
+  if (total <= 0) return {}
+  const span = Math.max(total - 1, 1)
+  const a = index / span
+  const b = (index + 0.45) / span
+  const h1 = 156 + a * 24
+  const h2 = 158 + b * 22
+  const s1 = 24 + a * 10
+  const s2 = 28 + b * 8
+  const l1 = 88 - a * 10
+  const l2 = 76 - b * 12
+  return {
+    background: `linear-gradient(142deg, hsl(${h1} ${s1}% ${l1}% / 0.9), hsl(${h2} ${s2}% ${l2}% / 0.82))`,
+    borderColor: 'rgba(255,255,255,0.42)',
+  }
+}
 
 export function TaskListScreen({
   displayName,
@@ -64,6 +81,8 @@ export function TaskListScreen({
     [onSelectTask],
   )
 
+  const n = tasks.length
+
   return (
     <div className="flex min-h-dvh flex-col">
       <div className="mt-3 flex flex-col items-center gap-3">
@@ -85,8 +104,8 @@ export function TaskListScreen({
         </div>
       </div>
 
-      <div className="mt-8 flex flex-1 flex-col gap-4">
-        {tasks.map((task) => (
+      <div className="mt-5 flex min-h-0 flex-1 flex-col gap-3">
+        {tasks.map((task, index) => (
           <div
             key={task.id}
             role="button"
@@ -98,7 +117,8 @@ export function TaskListScreen({
               }
             }}
             onClick={() => onRowActivate(task.id)}
-            className="flex w-full cursor-pointer items-center justify-between rounded-xl3 bg-pc-surface/70 px-5 py-4 text-left shadow-neuSm transition active:scale-[0.995]"
+            style={taskCardStyle(index, n)}
+            className="flex w-full cursor-pointer items-center justify-between rounded-xl3 border px-5 py-4 text-left shadow-neuSm transition active:scale-[0.995]"
           >
             <div className="min-w-0 flex-1">
               <div
@@ -113,7 +133,7 @@ export function TaskListScreen({
                 {task.name}
               </div>
               <div className="mt-1 text-[12px] font-medium text-pc-text/55">
-                今日 · {task.todayCount} · 连续 {task.streak} 天 · 目标 {task.goal}
+                今日 · {task.todayCount} · 连续 {task.streak} 天 · 总计 {task.goal}
               </div>
             </div>
             <svg
@@ -134,23 +154,23 @@ export function TaskListScreen({
         ))}
       </div>
 
-      <button
-        type="button"
-        onClick={() => {
-          setTaskNameDraft('')
-          setTaskGoalDraft('0')
-          setCreateOpen(true)
-        }}
-        className="mt-6 rounded-xl2 bg-white px-5 py-3 text-[14px] font-semibold tracking-tightish text-pc-accent shadow-[12px_14px_28px_rgba(27,51,46,0.18),-10px_-10px_22px_rgba(255,255,255,0.75)] transition active:scale-[0.99]"
-      >
-        + 新建任务
-      </button>
+      <div className="mt-4 flex shrink-0 flex-col gap-3 pb-[max(1rem,env(safe-area-inset-bottom))] pt-2">
+        <button
+          type="button"
+          onClick={() => {
+            setTaskNameDraft('')
+            setTaskGoalDraft('0')
+            setCreateOpen(true)
+          }}
+          className="rounded-xl2 bg-white px-5 py-3 text-[14px] font-semibold tracking-tightish text-pc-accent shadow-[12px_14px_28px_rgba(27,51,46,0.18),-10px_-10px_22px_rgba(255,255,255,0.75)] transition active:scale-[0.99]"
+        >
+          + 新建任务
+        </button>
 
-      <div className="mt-auto pb-2 pt-10 text-center">
         <button
           type="button"
           onClick={onLogout}
-          className="text-[12px] font-medium text-pc-text/45 underline-offset-4 hover:text-pc-text/65"
+          className="py-1 text-center text-[12px] font-medium text-pc-text/45 underline-offset-4 hover:text-pc-text/65"
         >
           退出登录
         </button>
@@ -202,7 +222,7 @@ export function TaskListScreen({
           </label>
           <label className="mt-4 flex flex-col gap-1.5 text-left">
             <span className="text-[11px] font-semibold tracking-[0.14em] text-pc-text/55">
-              每日目标（可为 0）
+              总计（可为 0）
             </span>
             <input
               type="number"
