@@ -51,7 +51,7 @@ export function AuthScreen() {
               required
               value={email}
               onChange={(e) => setEmail(e.target.value)}
-              className="rounded-xl2 border border-pc-text/18 bg-white px-4 py-3 text-[15px] font-medium text-pc-text shadow-none outline-none ring-pc-accent/30 focus:border-pc-accent/40 focus:ring-2"
+              className="box-border min-h-[48px] w-full appearance-none rounded-[18px] border border-pc-text/18 bg-white px-4 py-3 text-[15px] font-medium text-pc-text shadow-none outline-none ring-pc-accent/30 focus:border-pc-accent/40 focus:ring-2"
             />
           </label>
           <label className="flex flex-col gap-1.5 text-left">
@@ -65,7 +65,7 @@ export function AuthScreen() {
               minLength={6}
               value={password}
               onChange={(e) => setPassword(e.target.value)}
-              className="rounded-xl2 border border-pc-text/18 bg-white px-4 py-3 text-[15px] font-medium text-pc-text shadow-none outline-none ring-pc-accent/30 focus:border-pc-accent/40 focus:ring-2"
+              className="box-border min-h-[48px] w-full appearance-none rounded-[18px] border border-pc-text/18 bg-white px-4 py-3 text-[15px] font-medium text-pc-text shadow-none outline-none ring-pc-accent/30 focus:border-pc-accent/40 focus:ring-2"
             />
           </label>
 
@@ -78,7 +78,7 @@ export function AuthScreen() {
           <button
             type="submit"
             disabled={busy}
-            className="mt-2 rounded-xl2 bg-white px-4 py-3 text-[15px] font-semibold tracking-tightish text-pc-accent shadow-[12px_14px_28px_rgba(27,51,46,0.18),-10px_-10px_22px_rgba(255,255,255,0.75)] transition enabled:active:scale-[0.99] disabled:opacity-50"
+            className="mt-2 min-h-[48px] w-full appearance-none rounded-[18px] bg-white px-4 py-3 text-[15px] font-semibold tracking-tightish text-pc-accent shadow-[12px_14px_28px_rgba(27,51,46,0.18),-10px_-10px_22px_rgba(255,255,255,0.75)] transition enabled:active:scale-[0.99] disabled:opacity-50"
           >
             {busy ? 'Please wait…' : mode === 'signup' ? 'Sign up' : 'Log in'}
           </button>
