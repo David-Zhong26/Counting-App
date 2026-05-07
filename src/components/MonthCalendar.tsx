@@ -1,8 +1,11 @@
 import { useMemo, useState } from 'react'
 import { NeumorphicCard } from '../ui/NeumorphicCard'
 import { parseLocalDate, toLocalDateString } from '../lib/dateUtils'
+import type { Lang } from '../lib/lang'
+import { strings } from '../lib/strings'
 
-const DOW = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'] as const
+const DOW_EN = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'] as const
+const DOW_ZH = ['一', '二', '三', '四', '五', '六', '日'] as const
 
 function startOfMonth(d: Date) {
   return new Date(d.getFullYear(), d.getMonth(), 1)
@@ -23,12 +26,15 @@ function mondayIndex(jsDay: number) {
 }
 
 export function MonthCalendar({
+  lang,
   dailyCounts,
   todayStr,
 }: {
+  lang: Lang
   dailyCounts: Record<string, number>
   todayStr: string
 }) {
+  const s = strings(lang)
   const [cursor, setCursor] = useState(() => startOfMonth(parseLocalDate(todayStr)))
 
   const { grid, label, monthKey } = useMemo(() => {
@@ -68,29 +74,29 @@ export function MonthCalendar({
           type="button"
           onClick={() => setCursor((c) => addMonths(c, -1))}
           className="grid h-8 w-8 place-items-center rounded-full bg-white/55 text-pc-text/70 shadow-neuInset transition active:scale-[0.99]"
-          aria-label="Previous month"
+          aria-label={s.prevMonth}
         >
           ‹
         </button>
 
         <div className="text-center">
-          <div className="text-[12px] font-semibold tracking-[0.14em] text-pc-text/55">CALENDAR</div>
+          <div className="text-[12px] font-semibold tracking-[0.14em] text-pc-text/55">{s.calendarTitle.toUpperCase()}</div>
           <div className="mt-1 text-[14px] font-semibold tracking-tightish text-pc-text">{label}</div>
-          {!hasAny && <div className="mt-1 text-[11px] font-medium text-pc-text/45">本月暂无记录</div>}
+          {!hasAny && <div className="mt-1 text-[11px] font-medium text-pc-text/45">{s.monthEmpty}</div>}
         </div>
 
         <button
           type="button"
           onClick={() => setCursor((c) => addMonths(c, 1))}
           className="grid h-8 w-8 place-items-center rounded-full bg-white/55 text-pc-text/70 shadow-neuInset transition active:scale-[0.99]"
-          aria-label="Next month"
+          aria-label={s.nextMonth}
         >
           ›
         </button>
       </div>
 
       <div className="mt-4 grid grid-cols-7 gap-2">
-        {DOW.map((d) => (
+        {(lang === 'zh' ? DOW_ZH : DOW_EN).map((d) => (
           <div key={d} className="text-center text-[11px] font-medium text-pc-text/55">
             {d}
           </div>

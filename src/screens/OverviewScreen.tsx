@@ -3,7 +3,10 @@ import { MonthCalendar } from '../components/MonthCalendar'
 import { ProgressRing } from '../components/ProgressRing'
 import { RecentActivityList } from '../components/RecentActivityList'
 import { CircleIconButton } from '../ui/CircleIconButton'
+import type { Lang } from '../lib/lang'
+import { strings } from '../lib/strings'
 export function OverviewScreen({
+  lang,
   displayName,
   taskName,
   weeklyPercent,
@@ -13,6 +16,7 @@ export function OverviewScreen({
   todayStr,
   onBack,
 }: {
+  lang: Lang
   displayName: string | null
   taskName: string
   weeklyPercent: number
@@ -22,7 +26,8 @@ export function OverviewScreen({
   todayStr: string
   onBack: () => void
 }) {
-  const greetingLine = `你好呀～${displayName?.trim() || '朋友'}`
+  const s = strings(lang)
+  const greetingLine = s.greeting(displayName)
   return (
     <div className="flex min-h-dvh flex-col">
       <div className="mt-1 flex items-center justify-between">
@@ -49,9 +54,9 @@ export function OverviewScreen({
       </div>
 
       <div className="mt-8 space-y-5">
-        <MonthCalendar dailyCounts={dailyCounts} todayStr={todayStr} />
+        <MonthCalendar lang={lang} dailyCounts={dailyCounts} todayStr={todayStr} />
         <ProgressRing percent={weeklyPercent} daysHit={weekDaysHit} />
-        <RecentActivityList rows={activity} />
+        <RecentActivityList lang={lang} rows={activity} />
       </div>
     </div>
   )

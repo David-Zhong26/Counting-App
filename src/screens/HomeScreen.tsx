@@ -2,12 +2,15 @@ import { useEffect, useRef, useState } from 'react'
 import { ModalShell } from '../components/ModalShell'
 import { SummaryPanel } from '../components/SummaryPanel'
 import { CircleIconButton } from '../ui/CircleIconButton'
+import type { Lang } from '../lib/lang'
+import { strings } from '../lib/strings'
 
 /** Matches TODAY / GOAL / STREAK label typography */
 const enCaptionClass =
   'text-[12px] font-medium tracking-[0.18em] text-pc-text/55 uppercase'
 
 export function HomeScreen({
+  lang,
   displayName,
   taskName,
   todayCount,
@@ -22,6 +25,7 @@ export function HomeScreen({
   onBackToTasks,
   onGoOverview,
 }: {
+  lang: Lang
   displayName: string | null
   taskName: string
   todayCount: number
@@ -36,6 +40,7 @@ export function HomeScreen({
   onBackToTasks: () => void
   onGoOverview: () => void
 }) {
+  const s = strings(lang)
   const [editing, setEditing] = useState(false)
   const [draft, setDraft] = useState(String(todayCount))
   const inputRef = useRef<HTMLInputElement>(null)
@@ -50,8 +55,10 @@ export function HomeScreen({
 
   const [pop1, setPop1] = useState(false)
   const [pop3, setPop3] = useState(false)
+  const [taglineIndex, setTaglineIndex] = useState(0)
 
-  const greetingLine = `你好呀～${displayName?.trim() || '朋友'}`
+  const greetingLine = s.greeting(displayName)
+  const taglines = lang === 'zh' ? [s.smallSteps, s.smallSteps2, s.smallSteps3, s.smallSteps4] : [s.smallSteps, s.smallSteps2, s.smallSteps3, s.smallSteps4]
 
   useEffect(() => {
     if (!editing) {
@@ -59,6 +66,13 @@ export function HomeScreen({
       setDraft(String(todayCount))
     }
   }, [todayCount, editing])
+
+  useEffect(() => {
+    const id = window.setInterval(() => {
+      setTaglineIndex((i) => (i + 1) % taglines.length)
+    }, 5000)
+    return () => window.clearInterval(id)
+  }, [taglines.length])
 
   useEffect(() => {
     if (!goalOpen) setGoalDraft(String(goal))
@@ -149,9 +163,7 @@ export function HomeScreen({
         >
           <span className="text-[26px] font-semibold tracking-tightish text-pc-text">{taskName}</span>
         </button>
-        <p className={`mt-3 max-w-[18rem] px-2 ${enCaptionClass}`}>
-          Small steps, lasting change.
-        </p>
+        <p className={`mt-3 max-w-[18rem] px-2 ${enCaptionClass}`}>{taglines[taglineIndex] ?? ''}</p>
       </div>
 
       <div className="mt-8 flex flex-1 flex-col items-center pb-4">
@@ -203,7 +215,7 @@ export function HomeScreen({
             −1
           </button>
         </div>
-        <div className={`mt-3 ${enCaptionClass}`}>Today</div>
+        <div className={`mt-3 ${enCaptionClass}`}>{s.today}</div>
 
         <div className="mt-6 flex flex-row items-center justify-center gap-4">
           <button
@@ -238,7 +250,7 @@ export function HomeScreen({
 
       {goalOpen && (
         <ModalShell
-          title="总计"
+          title={s.total}
           onClose={() => !goalBusy && setGoalOpen(false)}
           footer={
             <div className="flex gap-3">
@@ -248,7 +260,7 @@ export function HomeScreen({
                 onClick={() => setGoalOpen(false)}
                 className="flex-1 rounded-xl2 bg-pc-bg/80 py-2.5 text-[13px] font-semibold text-pc-text/70 shadow-neuInset"
               >
-                取消
+                {s.cancel}
               </button>
               <button
                 type="button"
@@ -265,13 +277,15 @@ export function HomeScreen({
                 }}
                 className="flex-1 rounded-xl2 bg-white py-2.5 text-[13px] font-semibold text-pc-accent shadow-[12px_14px_28px_rgba(27,51,46,0.14)]"
               >
-                {goalBusy ? '保存中…' : '保存'}
+                {goalBusy ? s.saving : s.save}
               </button>
             </div>
           }
         >
           <label className="flex flex-col gap-1.5 text-left">
-            <span className="text-[11px] font-semibold tracking-[0.14em] text-pc-text/55">总计（可为 0）</span>
+            <span className="text-[11px] font-semibold tracking-[0.14em] text-pc-text/55">
+              {s.modalTotal}
+            </span>
             <input
               type="number"
               min={0}
@@ -286,7 +300,7 @@ export function HomeScreen({
 
       {taskNameOpen && (
         <ModalShell
-          title="重命名任务"
+          title={s.renameTitle}
           onClose={() => !taskNameBusy && setTaskNameOpen(false)}
           footer={
             <div className="flex gap-3">
@@ -296,7 +310,7 @@ export function HomeScreen({
                 onClick={() => setTaskNameOpen(false)}
                 className="flex-1 rounded-xl2 bg-pc-bg/80 py-2.5 text-[13px] font-semibold text-pc-text/70 shadow-neuInset"
               >
-                取消
+                {s.cancel}
               </button>
               <button
                 type="button"
@@ -312,13 +326,15 @@ export function HomeScreen({
                 }}
                 className="flex-1 rounded-xl2 bg-white py-2.5 text-[13px] font-semibold text-pc-accent shadow-[12px_14px_28px_rgba(27,51,46,0.14)]"
               >
-                {taskNameBusy ? '保存中…' : '保存'}
+                {taskNameBusy ? s.saving : s.save}
               </button>
             </div>
           }
         >
           <label className="flex flex-col gap-1.5 text-left">
-            <span className="text-[11px] font-semibold tracking-[0.14em] text-pc-text/55">任务名称</span>
+            <span className="text-[11px] font-semibold tracking-[0.14em] text-pc-text/55">
+              {s.taskNameLabel}
+            </span>
             <input
               value={taskNameDraft}
               onChange={(e) => setTaskNameDraft(e.target.value)}

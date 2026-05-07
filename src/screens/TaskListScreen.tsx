@@ -1,6 +1,9 @@
 import { useCallback, useMemo, useRef, useState, type CSSProperties } from 'react'
 import type { Task } from '../types/task'
 import { ModalShell } from '../components/ModalShell'
+import type { Lang } from '../lib/lang'
+import { useLang } from '../lib/lang'
+import { strings } from '../lib/strings'
 
 function taskCardStyle(index: number, total: number): CSSProperties {
   if (total <= 0) return {}
@@ -20,6 +23,7 @@ function taskCardStyle(index: number, total: number): CSSProperties {
 }
 
 export function TaskListScreen({
+  lang,
   displayName,
   tasks,
   onSelectTask,
@@ -29,6 +33,7 @@ export function TaskListScreen({
   onSaveDisplayName,
   onLogout,
 }: {
+  lang: Lang
   displayName: string | null
   tasks: Task[]
   onSelectTask: (taskId: string) => void
@@ -38,6 +43,8 @@ export function TaskListScreen({
   onSaveDisplayName: (name: string) => Promise<void>
   onLogout: () => void
 }) {
+  const { setLang } = useLang()
+  const s = strings(lang)
   const [createOpen, setCreateOpen] = useState(false)
   const [nameOpen, setNameOpen] = useState(false)
   const [renameTask, setRenameTask] = useState<Task | null>(null)
@@ -63,7 +70,7 @@ export function TaskListScreen({
   const [openSwipeId, setOpenSwipeId] = useState<string | null>(null)
 
   const showName = displayName?.trim() || null
-  const greetingLine = `你好呀～${showName ?? '朋友'}`
+  const greetingLine = s.greeting(showName)
 
   const flushNavigate = useCallback(() => {
     const p = pendingNavRef.current
@@ -137,21 +144,32 @@ export function TaskListScreen({
 
   return (
     <div className="flex min-h-dvh flex-col">
-      <div className="mt-3 flex flex-col items-center gap-3">
-        <button
-          type="button"
-          onClick={() => {
-            setNameDraft(displayName ?? '')
-            setNameOpen(true)
-          }}
-          className="max-w-[300px] text-center"
-        >
-          <div className="text-[17px] font-semibold tracking-tightish text-pc-text">{greetingLine}</div>
-        </button>
+      <div className="mt-8">
+        <div className="flex items-start justify-between gap-3">
+          <div className="w-12" aria-hidden />
+          <button
+            type="button"
+            onClick={() => {
+              setNameDraft(displayName ?? '')
+              setNameOpen(true)
+            }}
+            className="max-w-[300px] text-center"
+          >
+            <div className="text-[17px] font-semibold tracking-tightish text-pc-text">{greetingLine}</div>
+          </button>
+          <button
+            type="button"
+            onClick={() => setLang(lang === 'zh' ? 'en' : 'zh')}
+            className="rounded-full bg-white/55 px-3 py-1.5 text-[12px] font-semibold tracking-tightish text-pc-text/70 shadow-neuInset transition active:scale-[0.99]"
+            aria-label="Toggle language"
+          >
+            {s.langLabel}
+          </button>
+        </div>
 
-        <div className="text-center">
+        <div className="mt-4 text-center">
           <div className="text-[13px] font-medium text-pc-text/60">
-            {tasks.length === 0 ? '还没有任务，先添加一个吧。' : '选择一个任务开始计数。'}
+            {tasks.length === 0 ? s.noTasks : s.chooseTask}
           </div>
         </div>
       </div>
@@ -172,7 +190,7 @@ export function TaskListScreen({
               ].join(' ')}
               aria-label={`Delete ${task.name}`}
             >
-              删除
+              {s.delete}
             </button>
 
             <div
@@ -213,7 +231,7 @@ export function TaskListScreen({
                   {task.name}
                 </div>
                 <div className="mt-1 text-[12px] font-medium text-pc-text/55">
-                  今日 · {task.todayCount} · 连续 {task.streak} 天 · 总计 {task.goal}
+                  {s.today} · {task.todayCount} · {s.streakCn} {task.streak} {s.days} · {s.total} {task.goal}
                 </div>
               </div>
               <svg
@@ -245,7 +263,7 @@ export function TaskListScreen({
           }}
           className="rounded-xl2 bg-white px-5 py-3 text-[14px] font-semibold tracking-tightish text-pc-accent shadow-[12px_14px_28px_rgba(27,51,46,0.18),-10px_-10px_22px_rgba(255,255,255,0.75)] transition active:scale-[0.99]"
         >
-          + 新建任务
+          {s.createTask}
         </button>
 
         <button
@@ -253,13 +271,13 @@ export function TaskListScreen({
           onClick={onLogout}
           className="py-1 text-center text-[12px] font-medium text-pc-text/45 underline-offset-4 hover:text-pc-text/65"
         >
-          退出登录
+          {s.logout}
         </button>
       </div>
 
       {createOpen && (
         <ModalShell
-          title="新建任务"
+          title={s.modalCreateTitle}
           onClose={() => !busy && setCreateOpen(false)}
           footer={
             <div className="flex gap-3">
@@ -269,7 +287,7 @@ export function TaskListScreen({
                 onClick={() => setCreateOpen(false)}
                 className="flex-1 rounded-xl2 bg-pc-bg/80 py-2.5 text-[13px] font-semibold text-pc-text/70 shadow-neuInset"
               >
-                取消
+                {s.cancel}
               </button>
               <button
                 type="button"
@@ -287,23 +305,23 @@ export function TaskListScreen({
                 }}
                 className="flex-1 rounded-xl2 bg-white py-2.5 text-[13px] font-semibold text-pc-accent shadow-[12px_14px_28px_rgba(27,51,46,0.14)]"
               >
-                {busy ? '保存中…' : '创建'}
+                {busy ? s.saving : s.create}
               </button>
             </div>
           }
         >
           <label className="flex flex-col gap-1.5 text-left">
-            <span className="text-[11px] font-semibold tracking-[0.14em] text-pc-text/55">名称</span>
+            <span className="text-[11px] font-semibold tracking-[0.14em] text-pc-text/55">{s.modalName}</span>
             <input
               value={taskNameDraft}
               onChange={(e) => setTaskNameDraft(e.target.value)}
-              placeholder="例如：喝水"
+              placeholder={s.modalNamePh}
               className="rounded-xl2 border border-pc-text/14 bg-white px-3 py-2.5 text-[14px] font-medium text-pc-text outline-none ring-pc-accent/25 focus:border-pc-accent/35 focus:ring-2"
             />
           </label>
           <label className="mt-4 flex flex-col gap-1.5 text-left">
             <span className="text-[11px] font-semibold tracking-[0.14em] text-pc-text/55">
-              总计（可为 0）
+              {s.modalTotal}
             </span>
             <input
               type="number"
@@ -319,7 +337,7 @@ export function TaskListScreen({
 
       {nameOpen && (
         <ModalShell
-          title="昵称"
+          title={s.nicknameTitle}
           onClose={() => !busy && setNameOpen(false)}
           footer={
             <button
@@ -336,16 +354,16 @@ export function TaskListScreen({
               }}
               className="w-full rounded-xl2 bg-white py-2.5 text-[13px] font-semibold text-pc-accent shadow-[12px_14px_28px_rgba(27,51,46,0.14)]"
             >
-              {busy ? '保存中…' : '保存'}
+              {busy ? s.saving : s.save}
             </button>
           }
         >
           <label className="flex flex-col gap-1.5 text-left">
-            <span className="text-[11px] font-semibold tracking-[0.14em] text-pc-text/55">显示名称</span>
+            <span className="text-[11px] font-semibold tracking-[0.14em] text-pc-text/55">{s.displayNameLabel}</span>
             <input
               value={nameDraft}
               onChange={(e) => setNameDraft(e.target.value)}
-              placeholder="你的昵称"
+              placeholder={s.displayNameLabel}
               className="rounded-xl2 border border-pc-text/14 bg-white px-3 py-2.5 text-[14px] font-medium text-pc-text outline-none ring-pc-accent/25 focus:border-pc-accent/35 focus:ring-2"
             />
           </label>
@@ -354,7 +372,7 @@ export function TaskListScreen({
 
       {renameTask && (
         <ModalShell
-          title="重命名任务"
+          title={s.renameTitle}
           onClose={() => !busy && setRenameTask(null)}
           footer={
             <div className="flex gap-3">
@@ -364,7 +382,7 @@ export function TaskListScreen({
                 onClick={() => setRenameTask(null)}
                 className="flex-1 rounded-xl2 bg-pc-bg/80 py-2.5 text-[13px] font-semibold text-pc-text/70 shadow-neuInset"
               >
-                取消
+                {s.cancel}
               </button>
               <button
                 type="button"
@@ -380,13 +398,13 @@ export function TaskListScreen({
                 }}
                 className="flex-1 rounded-xl2 bg-white py-2.5 text-[13px] font-semibold text-pc-accent shadow-[12px_14px_28px_rgba(27,51,46,0.14)]"
               >
-                {busy ? '保存中…' : '保存'}
+                {busy ? s.saving : s.save}
               </button>
             </div>
           }
         >
           <label className="flex flex-col gap-1.5 text-left">
-            <span className="text-[11px] font-semibold tracking-[0.14em] text-pc-text/55">任务名称</span>
+            <span className="text-[11px] font-semibold tracking-[0.14em] text-pc-text/55">{s.taskNameLabel}</span>
             <input
               value={renameDraft}
               onChange={(e) => setRenameDraft(e.target.value)}
@@ -398,7 +416,7 @@ export function TaskListScreen({
 
       {deleteTaskTarget && (
         <ModalShell
-          title="删除任务？"
+          title={s.deleteConfirmTitle}
           onClose={() => !busy && setDeleteTaskTarget(null)}
           footer={
             <div className="flex gap-3">
@@ -408,7 +426,7 @@ export function TaskListScreen({
                 onClick={() => setDeleteTaskTarget(null)}
                 className="flex-1 rounded-xl2 bg-pc-bg/80 py-2.5 text-[13px] font-semibold text-pc-text/70 shadow-neuInset"
               >
-                取消
+                {s.cancel}
               </button>
               <button
                 type="button"
@@ -425,13 +443,13 @@ export function TaskListScreen({
                 }}
                 className="flex-1 rounded-xl2 bg-[#e66b6b] py-2.5 text-[13px] font-semibold text-white shadow-[12px_14px_28px_rgba(27,51,46,0.14)]"
               >
-                {busy ? '删除中…' : '删除'}
+                {busy ? s.deleting : s.delete}
               </button>
             </div>
           }
         >
           <div className="text-[13px] font-medium leading-relaxed text-pc-text/70">
-            将删除「{deleteTaskTarget.name}」以及它的所有记录。
+            {s.deleteConfirmBody(deleteTaskTarget.name)}
           </div>
         </ModalShell>
       )}

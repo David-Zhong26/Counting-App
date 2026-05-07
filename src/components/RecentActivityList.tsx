@@ -1,4 +1,6 @@
 import { NeumorphicCard } from '../ui/NeumorphicCard'
+import type { Lang } from '../lib/lang'
+import { strings } from '../lib/strings'
 
 export type ActivityRow = {
   label: string
@@ -6,11 +8,12 @@ export type ActivityRow = {
   time: string
 }
 
-export function RecentActivityList({ rows }: { rows: ActivityRow[] }) {
+export function RecentActivityList({ lang, rows }: { lang: Lang; rows: ActivityRow[] }) {
+  const s = strings(lang)
   return (
     <NeumorphicCard className="px-5 py-5">
       <div className="text-[12px] font-semibold tracking-[0.14em] text-pc-text/55">
-        RECENT ACTIVITY
+        {s.activityTitle.toUpperCase()}
       </div>
 
       <div className="mt-3 space-y-3">
@@ -30,7 +33,13 @@ export function RecentActivityList({ rows }: { rows: ActivityRow[] }) {
                 </svg>
               </div>
               <div>
-                <div className="text-[13px] font-semibold text-pc-text">{r.label}</div>
+                <div className="text-[13px] font-semibold text-pc-text">
+                  {r.label === 'Today'
+                    ? s.activityToday
+                    : r.label === 'Yesterday'
+                      ? s.activityYesterday
+                      : r.label}
+                </div>
                 <div className="text-[12px] font-medium text-pc-text/60">{r.count}</div>
               </div>
             </div>

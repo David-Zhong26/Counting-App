@@ -17,8 +17,12 @@ import {
 import { toErrorMessage } from './lib/toErrorMessage'
 import { supabase } from './lib/supabase.js'
 import { toLocalDateString } from './lib/dateUtils'
+import { useLang } from './lib/lang'
+import { strings } from './lib/strings'
 
 export function PulseApp({ userId }: { userId: string }) {
+  const { lang } = useLang()
+  const s = strings(lang)
   const [tasks, setTasks] = useState<Task[]>([])
   const [displayName, setDisplayName] = useState<string | null>(null)
   const [loading, setLoading] = useState(true)
@@ -111,7 +115,7 @@ export function PulseApp({ userId }: { userId: string }) {
         aria-label={frameLabel}
         className="grid min-h-dvh place-items-center text-[13px] font-medium text-pc-text/55"
       >
-        Loading…
+        {s.pleaseWait}
       </output>
     )
   }
@@ -153,7 +157,7 @@ export function PulseApp({ userId }: { userId: string }) {
           }}
           className="rounded-xl2 bg-white px-5 py-2.5 text-[13px] font-semibold text-pc-accent shadow-[12px_14px_28px_rgba(27,51,46,0.18),-10px_-10px_22px_rgba(255,255,255,0.75)]"
         >
-          Retry
+          {s.retry}
         </button>
       </div>
     )
@@ -163,6 +167,7 @@ export function PulseApp({ userId }: { userId: string }) {
     <>
       {screen === 'list' && (
         <TaskListScreen
+          lang={lang}
           displayName={displayName}
           tasks={tasks}
           onSelectTask={(id) => {
@@ -191,6 +196,7 @@ export function PulseApp({ userId }: { userId: string }) {
 
       {screen === 'detail' && selected && (
         <HomeScreen
+          lang={lang}
           displayName={displayName}
           taskName={selected.name}
           todayCount={selected.todayCount}
@@ -220,6 +226,7 @@ export function PulseApp({ userId }: { userId: string }) {
 
       {screen === 'overview' && selected && (
         <OverviewScreen
+          lang={lang}
           displayName={displayName}
           taskName={selected.name}
           weeklyPercent={selected.weeklyPercent}
