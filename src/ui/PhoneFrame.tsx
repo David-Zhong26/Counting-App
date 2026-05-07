@@ -1,5 +1,6 @@
 import type { ReactNode } from 'react'
 
+/** Full-bleed shell (no “phone card” frame). Safe areas only. */
 export function PhoneFrame({
   children,
   ariaLabel,
@@ -10,13 +11,10 @@ export function PhoneFrame({
   return (
     <section
       aria-label={ariaLabel}
-      className="relative w-full max-w-lg rounded-2xl bg-pc-surface/70 p-3 shadow-neu sm:p-4"
+      className="relative min-h-dvh w-full max-w-full"
     >
-      <div className="relative overflow-hidden rounded-xl bg-pc-bg">
-        <div className="absolute inset-0 bg-[radial-gradient(900px_600px_at_20%_0%,rgba(255,255,255,0.55),transparent_55%)]" />
-        <div className="relative max-h-[90dvh] overflow-y-auto px-4 pb-[max(1.5rem,env(safe-area-inset-bottom))] pt-[max(1rem,env(safe-area-inset-top))] sm:px-6">
-          {children}
-        </div>
+      <div className="relative min-h-dvh w-full overflow-x-hidden overflow-y-auto px-4 pb-[max(1rem,env(safe-area-inset-bottom))] pt-[max(0.75rem,env(safe-area-inset-top))] sm:px-5">
+        {children}
       </div>
     </section>
   )

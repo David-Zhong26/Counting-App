@@ -2,7 +2,7 @@ import { useEffect, useRef, useState } from 'react'
 import { ModalShell } from '../components/ModalShell'
 import { SummaryPanel } from '../components/SummaryPanel'
 import { CircleIconButton } from '../ui/CircleIconButton'
-import { PulseIcon } from '../ui/PulseIcon'
+
 export function HomeScreen({
   displayName,
   taskName,
@@ -116,8 +116,15 @@ export function HomeScreen({
       </div>
 
       <div className="mt-3 flex flex-col items-center text-center">
-        <div className="grid h-12 w-12 place-items-center rounded-full bg-pc-surface/70 shadow-neuInset">
-          <PulseIcon className="h-6 w-6 text-pc-accent/90" />
+        <div className="grid h-14 w-14 place-items-center overflow-hidden rounded-2xl bg-pc-surface/70 shadow-neuInset">
+          <img
+            src="/logo.png"
+            alt=""
+            width={44}
+            height={44}
+            className="h-11 w-11 object-contain"
+            decoding="async"
+          />
         </div>
 
         <button

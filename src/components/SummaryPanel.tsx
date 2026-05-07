@@ -11,47 +11,36 @@ export function SummaryPanel({
   streak: number
   onEditGoal?: () => void
 }) {
+  const labelClass =
+    'text-[12px] font-medium leading-none tracking-[0.18em] text-pc-text/55'
+  const valueClass = 'text-[22px] font-semibold leading-none tracking-tightish text-pc-text'
+
   return (
     <NeumorphicCard className="mt-6 px-5 py-4">
-      <div className="grid grid-cols-3 gap-3 text-center">
-        <SummaryItem label="Today" value={today} />
-        <SummaryItem label="Goal" value={goal} onPress={onEditGoal ?? undefined} />
-        <SummaryItem label="Streak" value={streak} />
+      <div className="grid grid-cols-3 grid-rows-2 items-center gap-x-2 gap-y-3 text-center sm:gap-x-3">
+        <div className={`${labelClass} col-start-1 row-start-1`}>TODAY</div>
+
+        {onEditGoal ? (
+          <button
+            type="button"
+            onClick={onEditGoal}
+            className="col-start-2 row-start-1 row-span-2 flex min-h-0 w-full flex-col items-center justify-center gap-2 rounded-xl2 border-0 bg-transparent p-0 transition hover:bg-pc-bg/35 active:scale-[0.99]"
+            aria-label="Edit daily goal"
+          >
+            <span className={labelClass}>GOAL</span>
+            <span className={valueClass}>{goal}</span>
+          </button>
+        ) : (
+          <div className="col-start-2 row-start-1 row-span-2 flex flex-col items-center justify-center gap-2">
+            <div className={labelClass}>GOAL</div>
+            <div className={valueClass}>{goal}</div>
+          </div>
+        )}
+
+        <div className={`${labelClass} col-start-3 row-start-1`}>STREAK</div>
+        <div className={`${valueClass} col-start-1 row-start-2`}>{today}</div>
+        <div className={`${valueClass} col-start-3 row-start-2`}>{streak}</div>
       </div>
     </NeumorphicCard>
   )
-}
-
-function SummaryItem({
-  label,
-  value,
-  onPress,
-}: {
-  label: string
-  value: number
-  onPress?: () => void
-}) {
-  const inner = (
-    <>
-      <div className="text-[12px] font-medium tracking-[0.18em] text-pc-text/55">
-        {label.toUpperCase()}
-      </div>
-      <div className="text-[22px] font-semibold tracking-tightish text-pc-text">{value}</div>
-    </>
-  )
-
-  if (onPress) {
-    return (
-      <button
-        type="button"
-        onClick={onPress}
-        className="flex flex-col gap-1 rounded-xl2 px-1 py-1 transition hover:bg-pc-bg/40 active:scale-[0.99]"
-        aria-label="Edit daily goal"
-      >
-        {inner}
-      </button>
-    )
-  }
-
-  return <div className="flex flex-col gap-1">{inner}</div>
 }
