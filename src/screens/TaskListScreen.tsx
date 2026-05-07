@@ -104,7 +104,7 @@ export function TaskListScreen({
         </div>
       </div>
 
-      <div className="mt-[calc(1.25rem+10px)] flex min-h-0 flex-1 flex-col gap-3 overflow-y-auto">
+      <div className="mt-[calc(1.25rem+30px)] flex min-h-0 flex-1 flex-col gap-3 overflow-y-auto">
         {tasks.map((task, index) => (
           <div
             key={task.id}
@@ -154,7 +154,7 @@ export function TaskListScreen({
         ))}
       </div>
 
-      <div className="-mt-[50px] flex shrink-0 flex-col gap-2.5 pb-[max(1rem,env(safe-area-inset-bottom))] pt-0">
+      <div className="-mt-[100px] flex shrink-0 flex-col gap-2.5 pb-[max(1rem,env(safe-area-inset-bottom))] pt-0">
         <button
           type="button"
           onClick={() => {

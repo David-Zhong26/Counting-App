@@ -191,6 +191,7 @@ export function PulseApp({ userId }: { userId: string }) {
           goal={selected.goal}
           streak={selected.streak}
           onIncrement={() => void persistCount(selected.id, selected.todayCount + 1)}
+          onIncrementBy3={() => void persistCount(selected.id, selected.todayCount + 3)}
           onDecrement={() =>
             void persistCount(selected.id, Math.max(0, selected.todayCount - 1))
           }

@@ -14,6 +14,7 @@ export function HomeScreen({
   goal,
   streak,
   onIncrement,
+  onIncrementBy3,
   onDecrement,
   onSetCount,
   onUpdateGoal,
@@ -27,6 +28,7 @@ export function HomeScreen({
   goal: number
   streak: number
   onIncrement: () => void
+  onIncrementBy3: () => void
   onDecrement: () => void
   onSetCount: (n: number) => void
   onUpdateGoal: (goal: number) => Promise<void>
@@ -47,6 +49,7 @@ export function HomeScreen({
   const [taskNameBusy, setTaskNameBusy] = useState(false)
 
   const [popTick, setPopTick] = useState(0)
+  const [popTick3, setPopTick3] = useState(0)
 
   const greetingLine = `你好呀～${displayName?.trim() || '朋友'}`
 
@@ -91,6 +94,11 @@ export function HomeScreen({
   function handleIncrement() {
     onIncrement()
     setPopTick((t) => t + 1)
+  }
+
+  function handleIncrementBy3() {
+    onIncrementBy3()
+    setPopTick3((t) => t + 1)
   }
 
   return (
@@ -195,15 +203,26 @@ export function HomeScreen({
         </div>
         <div className={`mt-3 ${enCaptionClass}`}>Today</div>
 
-        <button
-          key={popTick}
-          type="button"
-          onClick={handleIncrement}
-          className={`mt-6 grid h-28 w-28 place-items-center rounded-full bg-white shadow-[12px_14px_28px_rgba(27,51,46,0.18),-10px_-10px_22px_rgba(255,255,255,0.75)] transition active:scale-[0.99] ${popTick > 0 ? 'animate-pc-pop' : ''}`}
-          aria-label="Add one"
-        >
-          <span className="text-[34px] font-semibold tracking-tightish text-pc-accent">+1</span>
-        </button>
+        <div className="mt-6 flex flex-row items-center justify-center gap-4">
+          <button
+            key={popTick}
+            type="button"
+            onClick={handleIncrement}
+            className={`grid h-28 w-28 shrink-0 place-items-center rounded-full bg-white shadow-[12px_14px_28px_rgba(27,51,46,0.18),-10px_-10px_22px_rgba(255,255,255,0.75)] transition active:scale-[0.99] ${popTick > 0 ? 'animate-pc-pop' : ''}`}
+            aria-label="Add one"
+          >
+            <span className="text-[34px] font-semibold tracking-tightish text-pc-accent">+1</span>
+          </button>
+          <button
+            key={popTick3}
+            type="button"
+            onClick={handleIncrementBy3}
+            className={`grid h-28 w-28 shrink-0 place-items-center rounded-full bg-white shadow-[12px_14px_28px_rgba(27,51,46,0.18),-10px_-10px_22px_rgba(255,255,255,0.75)] transition active:scale-[0.99] ${popTick3 > 0 ? 'animate-pc-pop' : ''}`}
+            aria-label="Add three"
+          >
+            <span className="text-[34px] font-semibold tracking-tightish text-pc-accent">+3</span>
+          </button>
+        </div>
 
         <div className="mt-6 w-full">
           <SummaryPanel
